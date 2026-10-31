@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#20082B">
+  <title>Commission Request | Rinrobou Studio</title>
+  <link rel="stylesheet" href="commission.css">
+</head>
+<body>
+  <main>
+    <div class="commission-layout">
+      <form class="request-form">
+        <div>
+          <label class="field-label" for="commission-description">Description of Commission <span class="required-mark" aria-hidden="true">✦</span></label>
+          <textarea class="field-control" id="commission-description" name="description" placeholder="Insert details of commission here..." required></textarea>
+        </div>
+
+        <div>
+          <input class="file-input" id="reference-files" name="references" type="file" accept="image/*,.pdf" multiple aria-labelledby="reference-label">
+          <span class="sr-only" id="reference-label">Attach references and files</span>
+          <label class="file-control" for="reference-files">
+            <span class="file-button" aria-hidden="true">✧ &nbsp; Attach References and Files</span>
+            <span class="sr-only">Choose reference files</span>
+          </label>
+          <p class="file-help">Images and PDF files are welcome.</p>
+        </div>
+
+        <label class="check-row" for="physical-commission">
+          <input id="physical-commission" name="physical-commission" type="checkbox">
+          <span>Physical Commission?</span>
+        </label>
+
+        <div>
+          <label class="field-label" for="preferred-deadline">Preferred Deadline <span class="required-mark" aria-hidden="true">✦</span></label>
+          <input class="field-control" id="preferred-deadline" name="deadline" type="date">
+        </div>
+
+        <div>
+          <span class="section-label">Contact Information <span class="required-mark" aria-hidden="true">✦</span></span>
+          <div class="contact-fields">
+            <label>
+              <span class="sr-only">Email address</span>
+              <input class="field-control" name="email" type="email" placeholder="your@email.com" autocomplete="email" required>
+            </label>
+            <label>
+              <span class="sr-only">Phone number (optional)</span>
+              <input class="field-control" name="phone" type="tel" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel">
+            </label>
+          </div>
+        </div>
+
+        <div class="check-list">
+          <label class="check-row">
+            <input name="request-acknowledgement" type="checkbox" required>
+            <span>I understand that sending this request does not guarantee the commission will be accepted.</span>
+          </label>
+          <label class="check-row">
+            <input name="terms-accepted" type="checkbox" required>
+            <span>I accept Rinrobou Studio's Terms of Service.</span>
+          </label>
+        </div>
+
+        <button class="submit-button" type="submit">Send Request</button>
+      </form>
+    </div>
+  </main>
+
+</body>
+</html>

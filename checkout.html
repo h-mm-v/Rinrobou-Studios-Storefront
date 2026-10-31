@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#20082B">
+  <title>Checkout | Rinrobou Studio</title>
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+  <main>
+    <form class="checkout-panel">
+      <div class="customer-details">
+        <section class="form-section" aria-labelledby="contact-heading">
+          <h2 class="section-title" id="contact-heading">Contact Information ✦</h2>
+          <div class="field-stack">
+            <label>
+              <span class="sr-only">Email address</span>
+              <input type="email" name="email" placeholder="your@email.com" autocomplete="email" required>
+            </label>
+            <label>
+              <span class="sr-only">Phone number (optional)</span>
+              <input type="tel" name="phone" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel">
+            </label>
+            <label class="check-row">
+              <input type="checkbox" name="phone-updates">
+              <span>I would like to receive updates to this phone number</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="billing-heading">
+          <h2 class="section-title" id="billing-heading">Shipping and Billing Information ✦</h2>
+          <div class="field-stack">
+            <div class="field-row">
+              <label>
+                <span class="sr-only">First name</span>
+                <input type="text" name="first-name" placeholder="First Name" autocomplete="given-name" required>
+              </label>
+              <label>
+                <span class="sr-only">Last name</span>
+                <input type="text" name="last-name" placeholder="Last Name" autocomplete="family-name" required>
+              </label>
+            </div>
+            <label>
+              <span class="sr-only">Street address</span>
+              <input type="text" name="address" placeholder="Street Address" autocomplete="street-address" required>
+            </label>
+            <label>
+              <span class="sr-only">Apartment, suite, or unit (optional)</span>
+              <input type="text" name="address-extra" placeholder="Apartment, Suite, Unit, etc. (Optional)" autocomplete="address-line2">
+            </label>
+            <div class="field-row address-location">
+              <label>
+                <span class="sr-only">City</span>
+                <input type="text" name="city" placeholder="City" autocomplete="address-level2" required>
+              </label>
+              <label>
+                <span class="sr-only">State</span>
+                <input type="text" name="state" placeholder="State (i.e. CA)" autocomplete="address-level1" required>
+              </label>
+              <label>
+                <span class="sr-only">ZIP code</span>
+                <input type="text" name="postal-code" placeholder="ZIP Code" autocomplete="postal-code" required>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="payment-heading">
+          <h2 class="section-title" id="payment-heading">Payment Method ✦</h2>
+          <div class="payment-options" role="group" aria-label="Available payment methods">
+            <button class="payment-option" type="button" value="PayPal" aria-pressed="false">PayPal</button>
+            <button class="payment-option" type="button" value="Venmo" aria-pressed="false">Venmo</button>
+          </div>
+          <input type="hidden" name="payment-method" value="">
+        </section>
+      </div>
+
+      <div class="order-column">
+        <section class="order-summary" aria-labelledby="summary-heading">
+          <h2 id="summary-heading">Your Order</h2>
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>[Item Name]</td>
+                <td>[Item Price]</td>
+                <td>[Qty]</td>
+                <td>[Price × Qty]</td>
+              </tr>
+              <tr aria-hidden="true">
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr aria-hidden="true">
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr aria-hidden="true">
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <div class="checkout-totals">
+          <div class="order-totals">
+            <div class="total-line"><span>Subtotal:</span><span>[$Subtotal]</span></div>
+            <div class="total-line"><span>Sales Tax:</span><span>[$Tax]</span></div>
+            <div class="total-line grand-total"><span>Grand Total:</span><span>$###.##</span></div>
+          </div>
+          <button class="checkout-submit" type="submit">Complete Payment</button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script src="checkout.js" defer></script>
+</body>
+</html>

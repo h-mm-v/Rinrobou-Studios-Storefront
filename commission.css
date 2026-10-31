@@ -1,0 +1,213 @@
+    :root {
+      color-scheme: dark;
+      --mint: #9AF2D6;
+      --pink: #FD95E0;
+      --plum: #20082B;
+      --surface: #392047;
+      --surface-raised: #49265b;
+      --text: #fff8ff;
+      --muted: #d7c6de;
+      --line: rgb(154 242 214 / 55%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--text);
+      background: var(--plum);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    main {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(38px, 6vw, 76px) 20px;
+      background:
+        radial-gradient(circle, rgb(255 255 255 / 11%) 1px, transparent 1.5px) 0 0 / 22px 22px,
+        radial-gradient(ellipse at 18% 40%, rgb(47 69 102 / 74%), transparent 58%),
+        radial-gradient(ellipse at 92% 70%, rgb(93 27 101 / 56%), transparent 48%),
+        var(--plum);
+    }
+
+    .commission-layout {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .request-form {
+      display: grid;
+      gap: 22px;
+    }
+
+    .field-label,
+    .section-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--pink);
+      font-size: 0.95rem;
+    }
+
+    .required-mark {
+      color: var(--pink);
+      font-size: 1.1em;
+    }
+
+    .field-control {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      background: rgb(73 38 91 / 20%);
+    }
+
+    .field-control:focus-visible,
+    .file-input:focus-visible + .file-control .file-button,
+    .submit-button:focus-visible {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 3px rgb(154 242 214 / 22%);
+    }
+
+    .field-control::placeholder {
+      color: #decde4;
+      opacity: 0.82;
+    }
+
+    textarea.field-control {
+      min-height: 190px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    input.field-control {
+      min-height: 46px;
+      padding: 10px 14px;
+    }
+
+    input[type="date"].field-control {
+      max-width: 360px;
+      color: var(--muted);
+    }
+
+    .file-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .contact-fields {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 8px 13px;
+      color: var(--mint);
+      border: 1px solid rgb(154 242 214 / 45%);
+      border-radius: 10px;
+      background: rgb(154 242 214 / 9%);
+      cursor: pointer;
+    }
+
+    .file-button:hover {
+      background: rgb(154 242 214 / 17%);
+    }
+
+    .file-help {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: var(--mint);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .check-row input {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      margin: 2px 0 0;
+      accent-color: var(--mint);
+    }
+
+    .submit-button {
+      justify-self: start;
+      min-width: 205px;
+      min-height: 58px;
+      padding: 12px 28px;
+      color: var(--text);
+      border: 1px solid var(--mint);
+      border-radius: 18px;
+      background: linear-gradient(110deg, rgb(253 149 224 / 20%), rgb(154 242 214 / 18%));
+      cursor: pointer;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .submit-button:hover {
+      color: var(--text);
+      background: color-mix(in srgb, linear-gradient(110deg, rgb(253 149 224 / 20%), rgb(154 242 214 / 18%), transparent 85%));
+      border-color: var(--mint);
+    }
+
+    @media (max-width: 460px) {
+      main {
+        padding-inline: 16px;
+      }
+
+      textarea.field-control {
+        min-height: 160px;
+      }
+    }
