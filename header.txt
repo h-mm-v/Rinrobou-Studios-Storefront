@@ -1,0 +1,27 @@
+<header class="navbar">
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#catalog">Catalog</a>
+      <a href="sound.html">Portfolio</a>
+      <a href="index.html#about">About Us</a>
+    </nav>
+
+    <a href="index.html" class="nav-logo">
+      <img src="src/assets/logo-small.png" alt="RinRobou Studios" />
+    </a>
+
+    <div class="nav-icons">
+      <button class="icon-button" aria-label="Account">
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+        </svg>
+      </button>
+      <button aria-label="Search">⌕</button>
+      <button aria-label="Shopping cart">🛒</button>
+    </div>
+</header>
