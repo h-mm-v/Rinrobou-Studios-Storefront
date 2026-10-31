@@ -1,0 +1,30 @@
+
+html{
+    scroll-behavior: smooth;   
+}
+.sectionsContainer{
+    border: 2px solid black;
+    border-radius: 12px;
+    display: flex;
+    gap: 1rem;
+    height: 30vh;
+    padding: 1rem;
+}
+.logoContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.MainLogo{
+    height: auto;
+    width: 50%;
+}
+
+.HomepageRedirect{
+    display: flex;
+    gap: 1rem;
+    justify-content: space-evenly;
+}
+.SideRedirectText{
+    
+}
