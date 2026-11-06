@@ -13,11 +13,11 @@ interface CommissionRequest {
 }
 
 function getDatabaseConfig() {
-  const host = process.env.DB_HOST ?? databaseConfig.HOST ?? process.env.HOST;
-  const portValue = process.env.DB_PORT ?? databaseConfig.DB_PORT ?? '3306';
-  const user = process.env.DB_USER ?? databaseConfig.USER;
-  const password = process.env.DB_PASSWORD ?? databaseConfig.PASSWORD;
-  const database = process.env.DB_NAME ?? databaseConfig.DATABASE;
+  const host = databaseConfig.HOST;
+  const portValue = databaseConfig.DB_PORT;
+  const user = databaseConfig.USER;
+  const password = databaseConfig.PASSWORD;
+  const database = databaseConfig.DATABASE;
   const port = Number(portValue);
 
   if (!host || !user || !password || !database) {
