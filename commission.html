@@ -39,14 +39,14 @@
 
   <main>
     <div class="commission-layout">
-      <form class="request-form">
+      <form id="request-form" class="request-form" action="/api/commissions" method="post" enctype="multipart/form-data">
         <div>
           <label class="field-label" for="commission-description">Description of Commission <span class="required-mark" aria-hidden="true">✦</span></label>
-          <textarea class="field-control" id="commission-description" name="description" placeholder="Insert details of commission here..." required></textarea>
+          <textarea class="field-control" id="commission-description" name="description" placeholder="Insert details of commission here..." maxlength="10000" required></textarea>
         </div>
 
         <div>
-          <input class="file-input" id="reference-files" name="references" type="file" accept="image/*,.pdf" multiple aria-labelledby="reference-label">
+          <input class="file-input" id="reference-files" name="references" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif,image/bmp,.pdf" multiple aria-labelledby="reference-label">
           <span class="sr-only" id="reference-label">Attach references and files</span>
           <label class="file-control" for="reference-files">
             <span class="file-button" aria-hidden="true">✧ &nbsp; Attach References and Files</span>
@@ -70,11 +70,11 @@
           <div class="contact-fields">
             <label>
               <span class="sr-only">Email address</span>
-              <input class="field-control" name="email" type="email" placeholder="your@email.com" autocomplete="email" required>
+              <input class="field-control" name="email" type="email" maxlength="254" placeholder="your@email.com" autocomplete="email" required>
             </label>
             <label>
               <span class="sr-only">Phone number (optional)</span>
-              <input class="field-control" name="phone" type="tel" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel">
+              <input class="field-control" name="phone" type="tel" maxlength="40" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel">
             </label>
           </div>
         </div>
@@ -91,6 +91,7 @@
         </div>
 
         <button class="submit-button" type="submit">Send Request</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
   </main>
@@ -118,5 +119,6 @@
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
+  <script type="module" src="/commission-client.js"></script>
 </body>
 </html>
