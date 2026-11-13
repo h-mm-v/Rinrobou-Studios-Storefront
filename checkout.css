@@ -48,7 +48,7 @@ input {
 
 main {
   width: min(1200px, calc(100% - 40px));
-  margin: 42px auto 0;
+  margin: 42px auto;
 }
 
 .page-heading {
@@ -323,7 +323,7 @@ input:focus-visible {
 @media (max-width: 760px) {
   main {
     width: min(600px, calc(100% - 24px));
-    margin-top: 28px;
+    margin: 28px auto;
   }
 }
 
