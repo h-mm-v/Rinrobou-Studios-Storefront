@@ -146,14 +146,19 @@
           </table>
         </section>
         <div class="checkout-totals">
-          <div class="order-totals">
-            <div class="total-line"><span>Subtotal:</span><span>[$Subtotal]</span></div>
-            <div class="total-line"><span>Sales Tax:</span><span>[$Tax]</span></div>
-            <div class="total-line grand-total"><span>Grand Total:</span><span>$###.##</span></div>
+          <div class="totals-with-terms">
+            <a class="terms-link" href="terms-of-service.html" target="_blank" rel="noopener noreferrer" aria-label="Read the Terms of Service">
+              <img class="terms-link-image" src="src/assets/ToS-link.png" alt="">
+            </a>
+            <div class="order-totals">
+              <div class="total-line"><span>Subtotal:</span><span>[$Subtotal]</span></div>
+              <div class="total-line"><span>Sales Tax:</span><span>[$Tax]</span></div>
+              <div class="total-line grand-total"><span>Grand Total:</span><span>$###.##</span></div>
+            </div>
           </div>
           <div class="check-row terms-acceptance">
             <input id="terms-accepted" type="checkbox" name="terms-accepted" aria-label="I accept Rinrobou Studio's Terms of Service" required>
-            <span><label for="terms-accepted">I accept Rinrobou Studio's </label><a href="terms-of-service.html">Terms of Service</a>.</span>
+            <label for="terms-accepted">I accept Rinrobou Studio's Terms of Service.</label>
           </div>
           <button class="checkout-submit" type="submit">Complete Payment</button>
         </div>
