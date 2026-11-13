@@ -2,12 +2,9 @@
       color-scheme: dark;
       --mint: #9AF2D6;
       --pink: #FD95E0;
-      --plum: #20082B;
-      --surface: #392047;
-      --surface-raised: #49265b;
-      --text: #fff8ff;
-      --muted: #d7c6de;
-      --line: rgb(154 242 214 / 55%);
+      --purple: #170f36;
+      --purple-raised: #49265b;
+      --white: #ffffff;
     }
 
     * {
@@ -18,8 +15,8 @@
       min-height: 100vh;
       min-height: 100svh;
       margin: 0;
-      color: var(--text);
-      background: var(--plum);
+      color: var(--white);
+      background: var(--purple);
       font-family: "Segoe UI", Arial, sans-serif;
     }
 
@@ -55,7 +52,7 @@
         radial-gradient(circle, rgb(255 255 255 / 11%) 1px, transparent 1.5px) 0 0 / 22px 22px,
         radial-gradient(ellipse at 18% 40%, rgb(47 69 102 / 74%), transparent 58%),
         radial-gradient(ellipse at 92% 70%, rgb(93 27 101 / 56%), transparent 48%),
-        var(--plum);
+        var(--purple);
     }
 
     .commission-layout {
@@ -83,8 +80,8 @@
 
     .field-control {
       width: 100%;
-      color: var(--text);
-      border: 1px solid var(--line);
+      color: var(--white);
+      border: 1px solid var(--mint);
       border-radius: 12px;
       outline: none;
       background: rgb(73 38 91 / 20%);
@@ -115,7 +112,7 @@
 
     input[type="date"].field-control {
       max-width: 360px;
-      color: var(--muted);
+      color: var(--white);
     }
 
     .file-control {
@@ -158,7 +155,7 @@
 
     .file-help {
       margin: 8px 0 0;
-      color: var(--muted);
+      color: var(--white);
       font-size: 0.82rem;
     }
 
@@ -189,7 +186,7 @@
       min-width: 205px;
       min-height: 58px;
       padding: 12px 28px;
-      color: var(--text);
+      color: var(--white);
       border: 1px solid var(--mint);
       border-radius: 18px;
       background: linear-gradient(110deg, rgb(253 149 224 / 20%), rgb(154 242 214 / 18%));
@@ -200,7 +197,7 @@
     }
 
     .submit-button:hover {
-      color: var(--text);
+      color: var(--white);
       background: color-mix(in srgb, linear-gradient(110deg, rgb(253 149 224 / 20%), rgb(154 242 214 / 18%), transparent 85%));
       border-color: var(--mint);
     }
