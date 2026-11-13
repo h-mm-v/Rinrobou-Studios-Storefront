@@ -164,6 +164,28 @@
       gap: 9px;
     }
 
+    .check-list-and-terms {
+      position: relative;
+    }
+
+    .check-list {
+      width: calc(100% - 224px);
+    }
+
+    .commission-terms-link {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(200px, 28vw);
+    }
+
+    .commission-terms-link img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
     .check-row {
       display: flex;
       align-items: flex-start;
@@ -205,6 +227,23 @@
     @media (max-width: 460px) {
       main {
         padding-inline: 16px;
+      }
+
+      .check-list-and-terms {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(90px, 130px);
+        align-items: center;
+        gap: 12px;
+      }
+
+      .check-list {
+        width: auto;
+      }
+
+      .commission-terms-link {
+        position: static;
+        width: 100%;
+        transform: none;
       }
 
       textarea.field-control {

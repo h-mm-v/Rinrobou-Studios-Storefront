@@ -79,15 +79,20 @@
           </div>
         </div>
 
-        <div class="check-list">
-          <label class="check-row">
-            <input name="request-acknowledgement" type="checkbox" required>
-            <span>I understand that sending this request does not guarantee the commission will be accepted.</span>
-          </label>
-          <label class="check-row">
-            <input name="terms-accepted" type="checkbox" required>
-            <span>I accept Rinrobou Studio's Terms of Service.</span>
-          </label>
+        <div class="check-list-and-terms">
+          <div class="check-list">
+            <label class="check-row">
+              <input name="request-acknowledgement" type="checkbox" required>
+              <span>I understand that sending this request does not guarantee the commission will be accepted.</span>
+            </label>
+            <label class="check-row">
+              <input name="terms-accepted" type="checkbox" required>
+              <span>I accept Rinrobou Studio's Terms of Service.</span>
+            </label>
+          </div>
+          <a class="commission-terms-link" href="terms-of-service.html" target="_blank" rel="noopener noreferrer" aria-label="Read the Terms of Service">
+            <img src="src/assets/ToS-link.png" alt="">
+          </a>
         </div>
 
         <button class="submit-button" type="submit">Send Request</button>
