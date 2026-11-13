@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Results | RinRobou Studios</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .search-results-page {
+      width: min(86%, 1100px);
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+
+    .catalog-tools {
+      display: grid;
+      grid-template-columns: 145px minmax(0, 1fr) 54px;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .catalog-brand {
+      width: 110px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .categories-button {
+      border: 0;
+      background: transparent;
+      color: var(--white);
+      font-size: 18px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .search-box {
+      display: flex;
+      height: 46px;
+      overflow: hidden;
+      border: 3px solid var(--dark);
+      border-radius: 18px;
+      background: #dedede;
+    }
+
+    .search-box input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 0 20px;
+      background: transparent;
+      color: #222;
+      font-size: 14px;
+    }
+
+    .search-box input::placeholder {
+      color: #555;
+    }
+
+    .search-submit {
+      width: 54px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--mint);
+      color: white;
+      font-size: 25px;
+    }
+
+    .filters-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .filter-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-chip {
+      border: 0;
+      border-radius: 18px;
+      padding: 8px 16px;
+      background: #dedede;
+      color: #171717;
+      white-space: nowrap;
+    }
+
+    .sort-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: white;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .sort-control select {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font: inherit;
+    }
+
+    .sort-control option {
+      color: #222;
+    }
+
+    .search-results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px 34px;
+    }
+/*
+    .search-results-grid .product-card > img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      object-fit: cover;
+    } 
+
+    .search-results-grid .product-info {
+      min-height: 136px;
+      margin-top: 14px;
+      padding: 14px 16px 10px;
+      border-radius: 13px;
+      background: var(--dark);
+      text-align: center;
+    }
+
+    .search-results-grid .product-info h3 {
+      margin: 5px 0;
+      font-size: 13px;
+      font-weight: normal;
+    } 
+
+    .search-results-grid .rating {
+      margin: 5px 0;
+    }
+
+    .search-results-grid .price {
+      margin: 6px 0 10px;
+    } */
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 32px;
+    } 
+
+    .pagination button {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: #dedede;
+      color: #222;
+      font-weight: bold;
+    }
+
+    .pagination .active-page {
+      background: #23d6c2;
+      color: white;
+    }
+
+    @media (max-width: 800px) {
+      .catalog-tools {
+        grid-template-columns: 1fr auto;
+      }
+
+      .catalog-brand {
+        width: 110px;
+      }
+
+      .search-box {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+
+      .search-submit {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .filters-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .search-results-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 550px) {
+      .search-results-page {
+        width: 90%;
+      }
+
+      .search-results-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+        <nav class="nav-links">
+        <a href="homepage.html">Home</a>
+        <a href="catalog.html#catalog">Catalog</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="AboutUsPage.html">About Us</a>
+        </nav>
+
+        <a href="homepage.html" class="nav-logo">
+        <img src="src/assets/logo-small.png" alt="RinRobou Studios" />
+        </a>
+
+        <div class="nav-icons">
+        <a href="login.html">
+            <button class="icon-button" aria-label="Account">
+                    <svg
+                        width="16"
+                        height="16"
+                        stroke-width="1"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <circle cx="12" cy="8" r="3.5"></circle>
+                        <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+                    </svg>
+            </button>
+            </a>
+        <a href="SearchResultsPage.html">
+            <button aria-label="Search">
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                viewBox="0 0 24 24"
+                >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </a>
+        <a href="checkout.html">
+            <button aria-label="Shopping cart">
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"
+            >
+                <circle cx="8" cy="21" r="1"></circle>
+                <circle cx="19" cy="21" r="1"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+            </svg>
+            </button>
+        </a>
+        
+        </div>
+    </header>
+
+  <main class="search-results-page">
+    <section class="catalog-tools" aria-label="Catalog search tools">
+        <div class="categories-menu">
+            <button 
+                id="categories-button"
+                class="categories-button"
+                type="button"
+                aria-expanded="false"
+                >
+                ☰ Categories
+            </button>
+
+            <div id="categories-dropdown" class="categories-dropdown">
+                <a href="SearchResultsPage.html?category=animals">Animals</a>
+                <a href="SearchResultsPage.html?category=anime">Anime Style</a>
+                <a href="SearchResultsPage.html?category=character">Character Design</a>
+                <a href="SearchResultsPage.html?category=graphic">Graphic Design</a>
+                <a href="SearchResultsPage.html?category=mvs">MVs</a>
+                <a href="SearchResultsPage.html?category=gifts">Gifts</a>
+            </div>
+        </div>
+
+      <form class="search-box" action="#" method="get">
+        <input
+          type="search"
+          name="search"
+          placeholder="Search for anything"
+          aria-label="Search for anything"
+        />
+      </form>
+
+      <button class="search-submit" type="button" aria-label="Search">
+        ⌕
+      </button>
+    </section>
+
+    <section class="filters-row" aria-label="Product filters">
+      <div class="filter-list">
+        <button 
+            id="all-filters-button"
+            class="filter-chip"
+            type="button"
+            aria-expanded="false"
+            >
+            ☷ All Filters
+        </button>
+        <button class="filter-chip" type="button">Under $50</button>
+        <button class="filter-chip" type="button">Limited Time</button>
+        <button class="filter-chip" type="button">Pre-Orders</button>
+        <button class="filter-chip" type="button">Holiday</button>
+        <button class="filter-chip" type="button">Prints</button>
+        <button class="filter-chip" type="button">Acrylics</button>
+      </div>
+
+      <label class="sort-control">
+        <select aria-label="Sort products">
+          <option>Most Relevant</option>
+          <option>Newest</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="search-results-grid" aria-label="Search results">
+      <article class="product-card">
+        <img src="src/assets/donut-float.png" alt="Donut Floatie Chibi" />
+        <div class="product-info">
+          <p class="product-label">SUMMER TIME EXCLUSIVE</p>
+          <h3>Donut Floatie Chibi</h3>
+          <p class="rating">★★★★★ <span>(33)</span></p>
+          <p class="price">$25.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/butler-mage.png" alt="Butler and Maid Cafe Polaroid" />
+        <div class="product-info">
+          <p class="product-label">LIMITED TIME EXCLUSIVE</p>
+          <h3>Butler &amp; Maid Cafe Polaroid</h3>
+          <p class="rating">★★★★★ <span>(25)</span></p>
+          <p class="price">$55.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/halloween-chibi.png" alt="Halloween Costume Chibi" />
+        <div class="product-info">
+          <p class="product-label">HALLOWEEN EXCLUSIVE</p>
+          <h3>Halloween Costume Chibi</h3>
+          <p class="rating">★★★★★ <span>(7)</span></p>
+          <p class="price">$25.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/valentines-chibi.png" alt="Pokemon Onesies Chibi" />
+        <div class="product-info">
+          <p class="product-label">VALENTINE'S DAY EXCLUSIVE</p>
+          <h3>Pokemon Onesies Chibi</h3>
+          <p class="rating">★★★★★ <span>(10)</span></p>
+          <p class="price">$25.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/DNDAnimeStyleSkeb.png" alt="DND Anime Style Skeb" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE SKEB</p>
+          <h3>DND Anime Style Skeb</h3>
+          <p class="rating">★★★★★ <span>(3)</span></p>
+          <p class="price">$55.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/ValentinesDayChibi.png" alt="Valentine's Day Chibi" />
+        <div class="product-info">
+          <p class="product-label">LIMITED TIME EXCLUSIVE</p>
+          <h3>Valentine's Day Chibi</h3>
+          <p class="rating">★★★★★ <span>(12)</span></p>
+          <p class="price">$25.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/MVFullBody.png" alt="MV Full Body artwork" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE</p>
+          <h3>MV Full Body</h3>
+          <p class="rating">★★★★★ <span>(24)</span></p>
+          <p class="price">$110.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/CookieRunFanart.png" alt="Cookie Run Fanart" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE</p>
+          <h3>Cookie Run Fanart</h3>
+          <p class="rating">★★★★★ <span>(10)</span></p>
+          <p class="price">$75.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/MVFullBody2.png" alt="MV Full Body artwork" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE</p>
+          <h3>MV Full Body</h3>
+          <p class="rating">★★★★★ <span>(3)</span></p>
+          <p class="price">$55.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/DNDAnimeStyleSkeb2.png" alt="DND Anime Style Skeb" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE SKEB</p>
+          <h3>DND Anime Style Skeb</h3>
+          <p class="rating">★★★★★ <span>(25)</span></p>
+          <p class="price">$55.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/LeagueOfLegendsFanart.png" alt="League of Legends Fanart" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE SKEB</p>
+          <h3>League of Legends Fanart</h3>
+          <p class="rating">★★★★★ <span>(7)</span></p>
+          <p class="price">$55.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="src/assets/MVHalfBody.png" alt="MV Half Body artwork" />
+        <div class="product-info">
+          <p class="product-label">ANIME STYLE</p>
+          <h3>MV Half Body</h3>
+          <p class="rating">★★★★★ <span>(10)</span></p>
+          <p class="price">$25.00</p>
+          <button class="card-button" type="button">ADD TO BAG</button>
+        </div>
+      </article>
+    </section>
+
+    <nav class="pagination" aria-label="Search result pages">
+      <button type="button">←</button>
+      <button class="active-page" type="button">1</button>
+      <button type="button">2</button>
+      <button type="button">3</button>
+      <button type="button">4</button>
+      <button type="button">5</button>
+      <button type="button">→</button>
+    </nav>
+  </main>
+
+   <footer class="footer" id="about">
+    <div>
+      <img src="src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
+
+      <div class="footer-columns">
+        <div>
+          <strong>(951)-208-5524</strong>
+          <p>rinroboustudios@gmail.com</p>
+          <p>Burbank, CA</p>
+        </div>
+
+        <div>
+          <strong>Business Hours</strong>
+          <p>MONDAY - FRIDAY</p>
+          <p>9:00 AM - 5:00 PM</p>
+        </div>
+      </div>
+    </div>
+
+    <img src="src/assets/footer-art.png" alt="Character artwork" class="footer-art" />
+
+    <small>©2027 RinRobou Studios, All Rights Reserved</small>
+  </footer>
+
+  <!-- for All Filters button-->
+  <div id="filter-overlay" class="filter-overlay"></div>
+
+    <aside
+    id="filter-panel"
+    class="filter-panel"
+    aria-hidden="true"
+    >
+    <button
+        id="close-filters"
+        class="close-filters"
+        type="button"
+        aria-label="Close filters"
+    >
+        ◀
+    </button>
+
+    <div class="filter-panel-header">
+        <span>Filters</span>
+        <button id="reset-filters" type="button">Reset</button>
+    </div>
+
+    <div class="filter-option">
+        <button type="button">
+        Category
+        <span>▼</span>
+        </button>
+    </div>
+
+    <div class="filter-option">
+        <button type="button">
+        Item format
+        <span>▼</span>
+        </button>
+    </div>
+
+    <div class="filter-option">
+        <button type="button">
+        Popular
+        <span>▼</span>
+        </button>
+    </div>
+
+    <div class="filter-option">
+        <button type="button">
+        Price
+        <span>▼</span>
+        </button>
+    </div>
+
+    <div class="filter-option">
+        <button type="button">
+        Color
+        <span>▼</span>
+        </button>
+    </div>
+    </aside>
+
+    <script>
+        const filterButton = document.getElementById("all-filters-button");
+        const filterPanel = document.getElementById("filter-panel");
+        const filterOverlay = document.getElementById("filter-overlay");
+        const closeFilters = document.getElementById("close-filters");
+
+        function openFilters() {
+            filterPanel.classList.add("open");
+            filterOverlay.classList.add("visible");
+
+            filterButton.setAttribute("aria-expanded", "true");
+            filterPanel.setAttribute("aria-hidden", "false");
+        }
+
+        function closeFilterPanel() {
+            filterPanel.classList.remove("open");
+            filterOverlay.classList.remove("visible");
+
+            filterButton.setAttribute("aria-expanded", "false");
+            filterPanel.setAttribute("aria-hidden", "true");
+        }
+
+        filterButton.addEventListener("click", openFilters);
+        closeFilters.addEventListener("click", closeFilterPanel);
+        filterOverlay.addEventListener("click", closeFilterPanel);
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+            closeFilterPanel();
+            }
+        });
+    </script>
+
+    <!--Categories dropdown code-->
+    <script>
+        const categoriesButton = document.getElementById("categories-button");
+        const categoriesDropdown =
+            document.getElementById("categories-dropdown");
+
+        categoriesButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            const isOpen = categoriesDropdown.classList.toggle("open");
+
+            categoriesButton.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+            );
+        });
+
+        document.addEventListener("click", function () {
+            categoriesDropdown.classList.remove("open");
+            categoriesButton.setAttribute("aria-expanded", "false");
+        });
+    </script>
+</body>
+</html>
