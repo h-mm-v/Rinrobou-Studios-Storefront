@@ -196,34 +196,31 @@ input:focus-visible {
   cursor: pointer;
   font-weight: 700;
   text-align: center;
-  transition: opacity 200ms ease;
+  transition: box-shadow 200ms ease, transform 200ms ease;
 }
 
-.payment-option:hover,
-.payment-option[aria-pressed="true"] {
+.payment-option:hover {
   color: var(--white);
   border-color: var(--mint);
   background: color-mix(in srgb, var(--mint), transparent 25%);
-  animation: payment-option-fade-in 250ms ease both;
 }
 
-@keyframes payment-option-fade-in {
-  from {
-    opacity: 0;
-  }
+.payment-option[aria-pressed="true"] {
+  color: var(--purple);
+  border-color: var(--mint);
+  background: var(--mint);
+  box-shadow: 0 0 0 3px rgb(154 242 214 / 25%), 0 6px 18px rgb(5 2 15 / 28%);
+  transform: translateY(-1px);
+}
 
-  to {
-    opacity: 0.75;
-  }
+.payment-option:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .payment-option {
     transition: none;
-  }
-
-  .payment-option[aria-pressed="true"] {
-    animation: none;
   }
 }
 
@@ -324,6 +321,17 @@ input:focus-visible {
   color: var(--white);
   background: color-mix(in srgb, var(--mint), transparent 85%);
   border-color: var(--mint);
+}
+
+.checkout-status {
+  min-height: 1.5em;
+  color: var(--mint);
+  text-align: center;
+}
+
+.checkout-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .site-footer {
