@@ -32,7 +32,7 @@
         </svg>
       </button>
       <button aria-label="Search">⌕</button>
-      <button aria-label="Shopping cart">🛒</button>
+      <a href="checkout.html" aria-label="Shopping cart">🛒</a>
     </div>
   </header>
 
@@ -61,7 +61,7 @@
             <h3>Donut Float Chibi</h3>
             <p class="rating">★★★★★ <span>(33)</span></p>
             <p class="price">$25.00</p>
-            <button class="card-button">ADD TO BAG</button>
+            <button class="card-button" type="button" data-product-id="donut-float-chibi" data-product-name="Donut Float Chibi">ADD TO BAG</button>
           </div>
         </article>
 
@@ -72,7 +72,7 @@
             <h3>Butler &amp; Mage Polaroid</h3>
             <p class="rating">★★★★★ <span>(25)</span></p>
             <p class="price">$55.00</p>
-            <button class="card-button">ADD TO BAG</button>
+            <button class="card-button" type="button" data-product-id="butler-mage-polaroid" data-product-name="Butler &amp; Mage Polaroid">ADD TO BAG</button>
           </div>
         </article>
 
@@ -83,7 +83,7 @@
             <h3>Halloween Costume Chibi</h3>
             <p class="rating">★★★★★ <span>(7)</span></p>
             <p class="price">$25.00</p>
-            <button class="card-button">ADD TO BAG</button>
+            <button class="card-button" type="button" data-product-id="halloween-costume-chibi" data-product-name="Halloween Costume Chibi">ADD TO BAG</button>
           </div>
         </article>
 
@@ -94,10 +94,11 @@
             <h3>Pokemon Onesies Chibi</h3>
             <p class="rating">★★★★★ <span>(10)</span></p>
             <p class="price">$25.00</p>
-            <button class="card-button">ADD TO BAG</button>
+            <button class="card-button" type="button" data-product-id="pokemon-onesies-chibi" data-product-name="Pokemon Onesies Chibi">ADD TO BAG</button>
           </div>
         </article>
       </div>
+      <p id="cart-status" role="status" aria-live="polite"></p>
     </section>
 
     <section class="promo-section">
@@ -168,5 +169,6 @@
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
+  <script type="module" src="/catalog-client.js"></script>
 </body>
 </html>
