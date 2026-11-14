@@ -4,67 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../output.css">
+    <link rel="stylesheet" href="../style.css">
     <link rel="icon" type="image/png" href="../src/assets/logo-small.png">
     <title>Shopping Cart</title>
 </head>
 
 
 <body>
-    <main class="ShoppingCart-Background">
+    <header class="navbar">
+        <nav class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#catalog">Catalog</a>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#about">About Us</a>
+        </nav>
 
-        <div class="ShoppingCartHeader">
+        <a href="#home" class="nav-logo">
+            <img src="../src/assets/logo-small.png" alt="RinRobou Studios" />
+        </a>
+
+        <div class="nav-icons">
+            <button class="icon-button" aria-label="Account">
+                <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="3.5"></circle>
+                    <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+                </svg>
+            </button>
+            <button aria-label="Search">⌕</button>
+            <button aria-label="Shopping cart">🛒</button>
+        </div>
+    </header>
+
+    <main class="ShoppingCart-Background">
+        <div class="ShoppingCartContainer">
             <h1>Your Cart</h1>
+            <label class = "CheckBox">
+                <!--NEED TO FIX CHECKBOX LOCATION-->
+                Select all
+                <input type="checkbox" class="Checkbox" required>
+            </label>
+            <hr class="ShoppingCartTopDivider">
         </div>
 
-        <label class="SelectAll">
-            <!--NEED TO FIX CHECKBOX LOCATION-->
-            <input type="checkbox">
-            Select all ([item_amt])
-        </label>
 
-
-        <form class="ShoppingCartItem">
-            <input type="checkbox" class="ShoppingCartItemCheckbox">
-            <form>
-                <label>[item_name]</label>
-                <label>[item_type]</label>
-            </form>
-
-        </form>
-
-        <form class="ShoppingCartItem">
-            <input type="checkbox" class="ShoppingCartItemCheckbox">
-            <form>
-                <label>[item_name]</label>
-                <label>[item_type]</label>
-            </form>
-
-        </form>
-
-        <form class="ShoppingCartItem">
-            <input type="checkbox" class="ShoppingCartItemCheckbox">
-            <form>
-                <label>[item_name]</label>
-                <label>[item_type]</label>
-            </form>
-
-        </form>
 
 
         <form class="CheckOutForm">
-            <p class="CheckoutSubtotal">
-                Subtotal ([item_amt]): $[sub_cost]
-            </p>
-            <label class="CheckoutConfirm">
-                <input type="checkbox" class="Checkbox">
-                Confirm Order
-            </label>
+            <div class="CheckoutSubtotal">
+                <p>
+                    Subtotal ([item_amt]): $[sub_cost]
+                </p>
+                <label>
+                    <input type="checkbox" class="Checkbox" required>
+                    Confirm Order
+                </label>
+            </div>
             <div class="ProceedToCheckoutButton">
-                <button type="submit" class="button">Proceed to Checkout</button>
+                <button type="submit" class="button">
+                    <a href="../checkout.html">Proceed to Checkout</a>
+                </button>
             </div>
         </form>
     </main>
+
+    <footer class="footer" id="about">
+        <div class="footer-brand">
+            <img src="../src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
+
+            <div class="footer-columns">
+                <div>
+                    <strong>(951)-208-5524</strong>
+                    <p>rinroboustudios@gmail.com</p>
+                    <p>Burbank, CA</p>
+                </div>
+
+                <div>
+                    <strong>Business Hours</strong>
+                    <p>MONDAY - FRIDAY</p>
+                    <p>9:00 AM - 5:00 PM</p>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="#" aria-label="X">X</a>
+                <a href="#" aria-label="Instagram">◎</a>
+                <a href="#" aria-label="Pinterest">P</a>
+            </div>
+        </div>
+
+        <img src="../src/assets/footer-art.png" alt="RinRobou character artwork" class="footer-art" />
+
+        <small>©2027 RinRobou Studios, All Rights Reserved</small>
+    </footer>
 </body>
 
 </html>
