@@ -99,7 +99,7 @@
         </div>
 
         <!-- Waitlist -->
-        <div class="waitlist-card">
+        <div class="waitlist-card" id="waitlist-card" hidden>
           <h3>WAITLIST STATUS</h3>
 
           <p class="queue-label">CUSTOMER QUEUE</p>
@@ -123,9 +123,28 @@
 
         <button id="join-waitlist"
                 class="join-waitlist"
-                disabled>
+                disabled hidden>
           Join Waitlist
         </button>
+
+        <!-- Commissions Open -->
+      <div class="commissions-open-card" id="commissions-open-card">
+          <h3>COMMISSIONS ARE OPEN!</h3>
+
+          <p>
+              We're currently accepting new commissions!
+          </p>
+
+          <p>
+              Submit your request to get started.
+          </p>
+
+          <a href="commission.html" class="order-now-button">
+              ORDER NOW
+          </a>
+      </div>
+
+      <p id="waitlist-message" role="status"></p>
 
         <p id="waitlist-message" role="status"></p>
 
@@ -152,7 +171,7 @@
       <div id="product-tab-content">
 
         <!-- Description -->
-        <section id="description-panel" class="product-panel">
+        <section id="description-panel" class="product-panel" hidden>
           <div class="description-layout">
             <div class="description-text">
               <h2>MADE<br>FROM SCRATCH</h2>
@@ -207,14 +226,18 @@
               </ul>
             </div>
 
-            <div class="details-image-placeholder">
-              <span>Artwork Placeholder</span>
+            <div class="details-image-container">
+              <img
+                src="./src/assets/product-details.png"
+                alt="RinRobou Studios commission artwork"
+                class="details-art"
+              >
             </div>
           </div>
         </section>
 
         <!-- Reviews -->
-        <section id="reviews-panel" class="product-panel" hidden>
+        <section id="reviews-panel" class="product-panel">
           <div class="product-reviews">
 
             <div class="reviews-summary">
@@ -262,8 +285,12 @@
               </div>
 
               <div class="overall-rating">
-                <div class="review-avatar-placeholder">
-                  Reviews Image
+                <div class="reviews-avatar-container">
+                  <img
+                    src="./src/assets/product-reviews.png"
+                    alt="RinRobou Studios commission artwork"
+                    class="reviews-page-art"
+                  >
                 </div>
                 <p>⭐ 5.0 – 2 reviews</p>
               </div>
