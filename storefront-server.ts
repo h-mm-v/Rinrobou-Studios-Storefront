@@ -41,7 +41,6 @@ function serveTypeScriptClient(sourceFile: string) {
 
 app.get('/commission-client.js', serveTypeScriptClient('commission-client.ts'));
 app.get('/checkout-client.js', serveTypeScriptClient('checkout-client.ts'));
-app.get('/catalog-client.js', serveTypeScriptClient('catalog-client.ts'));
 
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
   console.error('Storefront server error:', error);
