@@ -48,6 +48,7 @@ input {
 
 main {
   width: min(1200px, calc(100% - 40px));
+  margin: 42px auto 0;
   margin: 42px auto 64px;
 }
 
