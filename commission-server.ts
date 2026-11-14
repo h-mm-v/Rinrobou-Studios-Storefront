@@ -1,10 +1,10 @@
-import mysql, { type ResultSetHeader } from 'mysql2/promise';
-import dotenv from 'dotenv';
-import express, { type ErrorRequestHandler } from 'express';
+import type { ResultSetHeader } from 'mysql2/promise';
+import { Router, type ErrorRequestHandler } from 'express';
 import multer from 'multer';
-import { mkdir, readFile, unlink } from 'node:fs/promises';
+import { mkdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { createDatabaseConnection } from './database.ts';
 
 interface CommissionRequest {
   email: string;
@@ -29,69 +29,12 @@ const uploadExtensions: Record<string, string[]> = {
   'image/webp': ['.webp'],
 };
 
-const databaseConfig = dotenv.config({ path: path.join(projectRoot, 'databaseDetails.env') }).parsed ?? {};
-
-function getDatabaseHost(value: string): string {
-  const configuredHost = value.trim();
-
-  if (configuredHost.startsWith('://')) {
-    throw new Error(
-      'HOST in databaseDetails.env is missing its hostname. Copy the complete database endpoint from AWS into HOST.',
-    );
-  }
-
-  if (configuredHost.includes('://')) {
-    try {
-      const parsedHost = new URL(configuredHost);
-      if (!parsedHost.hostname || (parsedHost.protocol !== 'https:' && parsedHost.protocol !== 'http:')) {
-        throw new Error();
-      }
-      return parsedHost.hostname;
-    } catch {
-      throw new Error(
-        'HOST in databaseDetails.env must be a valid database hostname or URL. Check the endpoint in AWS.',
-      );
-    }
-  }
-
-  if (!configuredHost || configuredHost.includes('/') || /\s/.test(configuredHost)) {
-    throw new Error(
-      'HOST in databaseDetails.env must be a complete database endpoint hostname. Check the endpoint in AWS.',
-    );
-  }
-
-  return configuredHost;
-}
-
-function getDatabaseConfig() {
-  const hostValue = databaseConfig.HOST ?? databaseConfig.DB_HOST ?? process.env.HOST ?? process.env.DB_HOST;
-  const user = databaseConfig.USER ?? databaseConfig.DB_USER ?? process.env.USER ?? process.env.DB_USER;
-  const password =
-    databaseConfig.PASSWORD ?? databaseConfig.DB_PASSWORD ?? process.env.PASSWORD ?? process.env.DB_PASSWORD;
-  const database =
-    databaseConfig.DATABASE ?? databaseConfig.DB_NAME ?? process.env.DATABASE ?? process.env.DB_NAME;
-  const port = Number(databaseConfig.DB_PORT ?? process.env.DB_PORT ?? 3306);
-
-  if (!hostValue || !user || !password || !database) {
-    throw new Error(
-      'Database configuration is incomplete. Set HOST, USER, PASSWORD, and DATABASE in databaseDetails.env.',
-    );
-  }
-
-  const host = getDatabaseHost(hostValue);
-
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error('Database port must be an integer between 1 and 65535.');
-  }
-
-  return { host, port, user, password, database };
+export async function initializeCommissionStorage(): Promise<void> {
+  await mkdir(uploadDirectory, { recursive: true });
 }
 
 export async function createCommission(commission: CommissionRequest): Promise<number> {
-  const connection = await mysql.createConnection({
-    ...getDatabaseConfig(),
-    ssl: { rejectUnauthorized: false },
-  });
+  const connection = await createDatabaseConnection();
 
   try {
     const values = [
@@ -112,7 +55,7 @@ export async function createCommission(commission: CommissionRequest): Promise<n
   }
 }
 
-const app = express();
+const router = Router();
 const upload = multer({
   storage: multer.diskStorage({
     destination: (_request, _file, callback) => callback(null, uploadDirectory),
@@ -149,25 +92,7 @@ function isValidDeadline(value: string): boolean {
   return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
 }
 
-app.disable('x-powered-by');
-app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.html')));
-app.get('/commission.html', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.html')));
-app.get('/commission.css', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.css')));
-app.get('/style.css', (_request, response) => response.sendFile(path.join(projectRoot, 'style.css')));
-app.use(
-  '/src/assets',
-  express.static(path.join(projectRoot, 'src', 'assets'), { dotfiles: 'deny', index: false }),
-);
-app.get('/commission-client.js', async (_request, response, next) => {
-  try {
-    const source = await readFile(path.join(projectRoot, 'commission-client.ts'), 'utf8');
-    response.setHeader('Content-Type', 'text/javascript; charset=utf-8').send(source);
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post('/api/commissions', upload.array('references', 5), async (request, response) => {
+router.post('/api/commissions', upload.array('references', 5), async (request, response) => {
   const uploadedFiles = (request.files ?? []) as Express.Multer.File[];
   const body = request.body ?? {};
   const removeUploadedFiles = async () => {
@@ -249,21 +174,6 @@ const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => 
   response.status(500).json({ message: 'The server could not process your request.' });
 };
 
-app.use(errorHandler);
+router.use(errorHandler);
 
-async function startServer(): Promise<void> {
-  await mkdir(uploadDirectory, { recursive: true });
-  const port = Number(process.env.PORT ?? 3000);
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error('PORT must be an integer between 1 and 65535.');
-  }
-
-  app.listen(port, () => {
-    console.log(`Commission server listening on port ${port}.`);
-  });
-}
-
-startServer().catch((error: unknown) => {
-  console.error('Failed to start commission server:', error);
-  process.exitCode = 1;
-});
+export { router as commissionRouter };

@@ -5,7 +5,9 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "mysql2": "^3.24.6",
-    "tailwindcss": "^4.3.3"
+    "stripe": "^23.1.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
@@ -17,7 +19,8 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node --experimental-strip-types commission-server.ts",
-    "dev": "node --watch --experimental-strip-types commission-server.ts"
+    "start": "node --experimental-strip-types storefront-server.ts",
+    "dev": "node --watch --experimental-strip-types storefront-server.ts",
+    "typecheck": "tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --strict --skipLibCheck checkout-client.ts checkout-server.ts commission-server.ts database.ts storefront-server.ts"
   }
 }
