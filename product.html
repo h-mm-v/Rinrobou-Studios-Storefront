@@ -128,26 +128,42 @@
         </button>
 
         <!-- Commissions Open -->
-      <div class="commissions-open-card" id="commissions-open-card">
-          <h3>COMMISSIONS ARE OPEN!</h3>
+        <div class="commissions-open-card" id="commissions-open-card">
+            <h3>COMMISSIONS ARE OPEN!</h3>
 
-          <p>
-              We're currently accepting new commissions!
-          </p>
+            <p>
+                We're currently accepting new commissions!
+            </p>
 
-          <p>
-              Submit your request to get started.
-          </p>
+            <p>
+                Submit your request to get started.
+            </p>
 
-          <a href="commission.html" class="order-now-button">
-              ORDER NOW
-          </a>
-      </div>
+            <p class="waitlist-instruction">
+              Please accept terms to place an order
+            </p>
 
-      <p id="waitlist-message" role="status"></p>
+            <label class="terms-checkbox">
+              <input type="checkbox" id="accept-commission-terms">
+              <span>
+                  I accept
+                  <a href="terms-of-service.html">
+                      RinRobou Studio's Terms of Service
+                  </a>
+              </span>
+            </label>
 
+            <a 
+              href="commission.html" 
+              class="order-now-button"
+              id="order-now"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+                ORDER NOW
+            </a>
+        </div>
         <p id="waitlist-message" role="status"></p>
-
       </div>
     </div>
 
@@ -171,7 +187,7 @@
       <div id="product-tab-content">
 
         <!-- Description -->
-        <section id="description-panel" class="product-panel" hidden>
+        <section id="description-panel" class="product-panel">
           <div class="description-layout">
             <div class="description-text">
               <h2>MADE<br>FROM SCRATCH</h2>
@@ -237,7 +253,7 @@
         </section>
 
         <!-- Reviews -->
-        <section id="reviews-panel" class="product-panel">
+        <section id="reviews-panel" class="product-panel" hidden>
           <div class="product-reviews">
 
             <div class="reviews-summary">
@@ -381,5 +397,6 @@
 
       <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
+  <script type="module" src="./product.ts"></script>
 </body>
 </html>

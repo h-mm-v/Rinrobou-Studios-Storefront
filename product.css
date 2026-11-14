@@ -80,6 +80,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    padding: 0 25px;
 }
 
 .product-page .product-main-image img {
@@ -284,7 +286,6 @@
 }
 
 /* Commission Availability */
-
 .product-page [hidden] {
     display: none !important;
 }
@@ -312,13 +313,18 @@
     margin: 0 0 12px;
 }
 
+.product-page .commissions-open-card .terms-checkbox {
+    margin-top: 15px;
+    text-align: left;
+}
+
 .product-page .order-now-button {
     display: block;
     width: 100%;
     margin-top: 25px;
     padding: 15px;
 
-    background: #cc83b6;
+    background: #80DACB;
     color: #20152f;
 
     border: none;
@@ -334,6 +340,12 @@
 
 .product-page .order-now-button:hover {
     background: #e5a1d0;
+}
+
+.product-page .order-now-button.disabled {
+    background: #59728a;
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 /* Product Tabs */
@@ -384,6 +396,7 @@
 .product-page .product-tab.active {
     color: white;
     background: #7654ae;
+    border-radius: 10px;
 }
 
 /* Description Tab */
