@@ -69,6 +69,8 @@ web_modules/
 .env
 .env.*
 !.env.example
+databaseDetails.env
+/commission-uploads/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

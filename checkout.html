@@ -15,10 +15,6 @@
         <a href="catalog.html">Catalog</a>
         <a href="portfolio.html">Portfolio</a>
         <a href="src/pages/AboutUsPage.tsx">About Us</a>
-        <a href="index.html">Home</a>
-        <a href="index.html#catalog">Catalog</a>
-        <a href="sound.html">Portfolio</a>
-        <a href="index.html#about">About Us</a>
       </nav>
 
       <a href="index.html" class="nav-logo">
@@ -41,7 +37,7 @@
       </div>
   </header>
   <main>
-    <form class="checkout-panel">
+    <form id="checkout-form" class="checkout-panel">
       <div class="customer-details">
         <section class="form-section" aria-labelledby="contact-heading">
           <h2 class="section-title" id="contact-heading">Contact Information ✦</h2>
@@ -96,14 +92,19 @@
                 <input type="text" name="postal-code" placeholder="ZIP Code" autocomplete="postal-code" required>
               </label>
             </div>
+            <label>
+              <span class="sr-only">Two-letter country code</span>
+              <input type="text" name="country" placeholder="Country code (e.g. US)" autocomplete="country" maxlength="2" pattern="[A-Za-z]{2}" required>
+            </label>
           </div>
         </section>
 
         <section class="form-section" aria-labelledby="payment-heading">
           <h2 class="section-title" id="payment-heading">Payment Method ✦</h2>
           <div class="payment-options" role="group" aria-label="Available payment methods">
-            <button class="payment-option" type="button" value="PayPal" aria-pressed="false">PayPal</button>
-            <button class="payment-option" type="button" value="Venmo" aria-pressed="false">Venmo</button>
+            <button class="payment-option" type="button" data-payment-method="paypal" aria-pressed="false">PayPal</button>
+            <button class="payment-option" type="button" data-payment-method="venmo" aria-pressed="false">Venmo</button>
+            <button class="payment-option" type="button" data-payment-method="stripe" aria-pressed="false">Stripe</button>
           </div>
           <input type="hidden" name="payment-method" value="">
         </section>
@@ -121,41 +122,27 @@
                 <th scope="col">Total</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>[Item Name]</td>
-                <td>[Item Price]</td>
-                <td>[Qty]</td>
-                <td>[Price × Qty]</td>
-              </tr>
-              <tr aria-hidden="true">
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr aria-hidden="true">
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr aria-hidden="true">
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-            </tbody>
+            <tbody id="order-items"></tbody>
           </table>
         </section>
         <div class="checkout-totals">
-          <div class="order-totals">
-            <div class="total-line"><span>Subtotal:</span><span>[$Subtotal]</span></div>
-            <div class="total-line"><span>Sales Tax:</span><span>[$Tax]</span></div>
-            <div class="total-line grand-total"><span>Grand Total:</span><span>$###.##</span></div>
+          <div class="totals-with-terms">
+            <a class="terms-link" href="terms-of-service.html" target="_blank" rel="noopener noreferrer" aria-label="Read the Terms of Service">
+              <img class="terms-link-image" src="src/assets/ToS-link.png" alt="">
+            </a>
+            <div class="order-totals">
+              <div class="total-line"><span>Subtotal:</span><span id="subtotal-value">$0.00</span></div>
+              <div class="total-line"><span>Sales Tax:</span><span id="tax-value">$0.00</span></div>
+              <div class="total-line"><span>Shipping:</span><span id="shipping-value">$0.00</span></div>
+              <div class="total-line grand-total"><span>Grand Total:</span><span id="grand-total-value">$0.00</span></div>
+            </div>
+          </div>
+          <div class="check-row terms-acceptance">
+            <input id="terms-accepted" type="checkbox" name="terms-accepted" aria-label="I accept Rinrobou Studio's Terms of Service" required>
+            <label for="terms-accepted">I accept Rinrobou Studio's Terms of Service.</label>
           </div>
           <button class="checkout-submit" type="submit">Complete Payment</button>
+          <p id="checkout-status" class="checkout-status" role="status" aria-live="polite"></p>
         </div>
       </div>
     </form>
@@ -184,5 +171,6 @@
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
+  <script type="module" src="/checkout-client.js"></script>
 </body>
 </html>
