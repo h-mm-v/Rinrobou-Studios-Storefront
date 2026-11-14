@@ -4,20 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../output.css">
+    <link rel="stylesheet" href="../style.css">
     <link rel="icon" type="image/png" href="../src/assets/logo-small.png">
     <title>404 Error</title>
 </head>
 
 
 <body>
+    <header class="navbar">
+        <nav class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#catalog">Catalog</a>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#about">About Us</a>
+        </nav>
+
+        <a href="#home" class="nav-logo">
+            <img src="../src/assets/logo-small.png" alt="RinRobou Studios" />
+        </a>
+
+        <div class="nav-icons">
+            <button class="icon-button" aria-label="Account">
+                <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="3.5"></circle>
+                    <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+                </svg>
+            </button>
+            <button aria-label="Search">⌕</button>
+            <button aria-label="Shopping cart">🛒</button>
+        </div>
+    </header>
+
     <main class="ErrorPage-background">
-        <div class="ErrorPageHeader">
-            <h1>Uh Oh!</h1>
-        </div>
-        <div class="ErrorPageMsg">
-            <p>Page not found...</p>
-        </div>
+        <section class="error-hero">
+            <div class="ErrorPageHeader">
+                <h1>Uh Oh!</h1>
+            </div>
+            <div class="ErrorPageMsg">
+                <p>Page not found...</p>
+            </div>
+        </section>
+
+        <footer class="footer" id="about">
+            <div>
+                <img src="../src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
+
+                <div class="footer-columns">
+                    <div>
+                        <strong>(951)-208-5524</strong>
+                        <p>rinroboustudios@gmail.com</p>
+                        <p>Burbank, CA</p>
+                    </div>
+
+                    <div>
+                        <strong>Business Hours</strong>
+                        <p>MONDAY - FRIDAY</p>
+                        <p>9:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+            <img src="../src/assets/footer-art.png" alt="Character artwork" class="footer-art" />
+            <small>©2027 RinRobou Studios, All Rights Reserved</small>
+        </footer>
     </main>
 </body>
 
