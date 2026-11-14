@@ -28,6 +28,7 @@
     gap: 15px;
     padding: 20px;
 
+    min-height: 600px;
     background: #2b1c59;
     border: 1px solid #a35ac4;
     border-radius: 14px;
@@ -115,7 +116,7 @@
 /* Product Image Placeholder */
 .product-page .product-image-placeholder {
     width: 100%;
-    min-height: 350px;
+    min-height: 550px;
 
     display: flex;
     align-items: center;
@@ -284,26 +285,36 @@
 
 /* Product Tabs */
 .product-page .product-bottom {
+    width: 100%;
     max-width: 1200px;
-    margin: 35px auto 0;
-    padding: 25px;
+    margin: 25px auto 0;
+    padding: 20px;
 
     background-color: #382879;
-    border-radius: 8px;
-
     background-image: radial-gradient(
         rgba(255, 255, 255, 0.08) 1px,
         transparent 1px
     );
-
     background-size: 14px 14px;
+
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .product-page .product-tabs {
     display: flex;
     gap: 25px;
     border-bottom: 1px solid #a35ac4;
+    margin-bottom: 10px;
+}
+
+.product-page .product-panel {
     margin-bottom: 25px;
+    scroll-margin-top: 90px;
+}
+
+.product-page .product-panel:last-child {
+    margin-bottom: 0;
 }
 
 .product-page .product-tab {
@@ -322,59 +333,82 @@
 }
 
 /* Description Tab */
+.product-page #description-panel {
+    position: relative;
+    height: 440px;
+    overflow: visible;
+}
+
 .product-page .description-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 48% 52%;
     align-items: center;
-    gap: 30px;
+    gap: 0;
+    height: 100%;
+    min-height: 0;
+}
+
+.product-page .description-text {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    transform: translateY(-75px);
 }
 
 .product-page .description-text h2 {
-    font-size: 42px;
+    font-family: Arial, sans-serif;
+    font-size: clamp(32px, 3.5vw, 46px);
+    font-weight: 800;
+    line-height: 1.25;
     color: #f0a8e5;
-    line-height: 1.3;
+    margin: 0 0 18px;
 }
 
 .product-page .description-text p {
-    line-height: 1.6;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+    color: #f5efff;
+    margin: 0 0 14px;
+    max-width: 400px;
 }
 
 .product-page .description-text ol {
-    padding-left: 20px;
+    font-family: Arial, sans-serif;
     font-size: 14px;
-    line-height: 1.7;
+    line-height: 1.65;
+    color: #f5efff;
+    padding-left: 22px;
+    margin: 0;
+}
+
+/* Description Image */
+.product-page .description-image-container {
+    position: relative;
+    justify-self: end;
+
+    width: 650px;
+    height: 650px;
+
+    border: 6px solid #e2a4ef;
+    border-radius: 50%;
+    overflow: hidden;
+    padding: 5px;
+
+    transform: translate(65px, 5px);
 }
 
 .product-page .description-art {
+    display: block;
     width: 100%;
-    max-height: 450px;
+    height: 100%;
     object-fit: cover;
+    object-position: center;
+    max-height: none;
+    border: none;
     border-radius: 50%;
-    border: 4px solid #e2a4ef;
-}
-
-.product-page .description-image-placeholder {
-    width: 100%;
-    min-height: 350px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: linear-gradient(
-        135deg,
-        #b7e4e3,
-        #d8b4e2
-    );
-
-    border: 3px dashed #e2a4ef;
-    border-radius: 50%;
-
-    color: #493065;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
 }
 
 /* Details Tab */
@@ -612,24 +646,26 @@
 
 /* Responsive Layout */
 @media (max-width: 850px) {
-    .product-page .product-top {
-        grid-template-columns: 1fr;
+    .product-page #description-panel {
+        height: auto;
+        overflow: hidden;
     }
 
     .product-page .description-layout {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
 
-    .product-page .product-details-layout {
-        grid-template-columns: 1fr;
+    .product-page .description-text h2 {
+        font-size: 32px;
     }
 
-    .product-page .reviews-summary {
-        grid-template-columns: 1fr;
-    }
-
-    .product-page .review-cards {
-        grid-template-columns: 1fr;
+    .product-page .description-image-container {
+        width: min(100%, 350px);
+        height: auto;
+        aspect-ratio: 1;
+        justify-self: center;
+        transform: none;
     }
 }
 
