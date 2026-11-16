@@ -6,6 +6,10 @@ body{
 a{
     text-decoration: none;
 }
+.AdminLayout{
+    display: flex;
+    min-height: 100vh;
+}
 .maincontainer{
     display: flex;
     flex-direction: row;
@@ -42,7 +46,7 @@ a{
     text-align: center;
     color:white;
     font-size: clamp(0.5rem,0.75vw + 0.5rem,1.5rem);
-
+    cursor:pointer;
     padding-left: 10px;
     padding-right: 10px;
 
@@ -57,9 +61,10 @@ a{
 }
 .mainAdminPanel{
     display: flex;
+    flex: 1;
     flex-direction: column;
     position: relative;
-    width: 100dvw;
+    min-width: 0;
     min-height: 100vh;
 }
 .GenericViewBox{
@@ -94,18 +99,19 @@ a{
     color: white;
     font-size: clamp(1rem,1vw + 1rem,3rem);
 }
-/*Commissions Page */
+/* Commissions */
 .CommissionsPage{
     display: flex;
     flex-direction: row;
+    margin-top: 2dvh;
 }
 .IncomingCommissions{
-    margin-top: 2dvh;
+    
     margin-left: 1dvw;
     width: 40dvw;
     height: 95dvh;
 
-    text-align: center;
+    
     font-size: 30px;
     background-color: grey;
     margin-right: auto;
@@ -113,9 +119,10 @@ a{
     border-color: black;
 }
 .CommissionsRight{
+    
     text-align: center;
     font-size: 20px;
-    margin-top: 2dvh;
+
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -137,7 +144,20 @@ a{
     width: 30dvw;
     height: 10dvh;
 }
+.CommissionEntry{
+    margin-top: 2px;
+    padding: 2px;
+    cursor: pointer ;
+    justify-content: left;
+    max-width: 100%;
+    height: 12dvh;
+    background-color: purple;
+    font-size: 30%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
+}
 .CommissionPopUp{
     align-items: center;
     display: flex;
@@ -148,9 +168,8 @@ a{
     background-color: grey;
     border: 2px solid;
     border-color: black;
-    visibility: hidden;
 }
-/*Manage Inventory */
+/* Inventory */
 .MainInventoryContainer{
     display: flex;
     align-items: center;
