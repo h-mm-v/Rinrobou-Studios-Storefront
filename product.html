@@ -76,19 +76,19 @@
         <!-- Licensing -->
         <div class="license-options">
           <label>
-            <input type="radio" name="license" value="personal" checked>
+            <input type="checkbox" name="license" value="personal" checked disabled>
             <span>Personal</span>
             <span class="license-price">Included</span>
           </label>
 
           <label>
-            <input type="radio" name="license" value="content">
+            <input type="checkbox" name="license" value="content" id="license-content">
             <span>Commercial: Content</span>
             <span class="license-price">+100%</span>
           </label>
 
           <label>
-            <input type="radio" name="license" value="merchandise">
+            <input type="checkbox" name="license" value="merchandise" id="license-merchandise">
             <span>Commercial: Merchandising</span>
             <span class="license-price">+100%</span>
           </label>
@@ -159,7 +159,7 @@
               id="order-now"
               aria-disabled="true"
               tabindex="-1"
-            >
+              >
                 ORDER NOW
             </a>
         </div>
@@ -397,6 +397,6 @@
 
       <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
-  <script type="module" src="./product.ts"></script>
+  <script type="module" src="./product.js"></script>
 </body>
 </html>

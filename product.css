@@ -615,6 +615,7 @@
 
     object-fit: cover;
     object-position: center;
+    transform: scale(1.16);
 
     border-radius: 50%;
 }

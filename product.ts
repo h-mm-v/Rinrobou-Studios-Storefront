@@ -1,5 +1,39 @@
-
 document.addEventListener("DOMContentLoaded", () => {
+    /* Licensing */
+    const basePrice = 65; // temp
+
+    const contentLicense = document.querySelector<HTMLInputElement>(
+        "#license-content"
+    );
+
+    const merchandiseLicense = document.querySelector<HTMLInputElement>(
+        "#license-merchandise"
+    );
+
+    const priceElement = document.querySelector<HTMLElement>(
+        "#product-price"
+    );
+
+    function updatePrice(): void {
+        let total = basePrice;
+
+        if (contentLicense?.checked) {
+            total *= 2;
+        }
+
+        if (merchandiseLicense?.checked) {
+            total *= 2;
+        }
+
+        if (priceElement) {
+            priceElement.textContent = `$${total.toFixed(2)}`;
+        }
+    }
+
+    contentLicense?.addEventListener("change", updatePrice);
+    merchandiseLicense?.addEventListener("change", updatePrice);
+
+    updatePrice();
 
     /* Product Tabs */
     const tabs = document.querySelectorAll<HTMLButtonElement>(
