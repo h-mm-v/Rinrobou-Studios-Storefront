@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+    /* Back Button */
+    const backButton = document.querySelector<HTMLButtonElement>(
+        "#back-button"
+    );
+
+    backButton?.addEventListener("click", () => {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = "catalog.html";
+        }
+    });
+    
     /* Licensing */
     const basePrice = 65; // temp
 
