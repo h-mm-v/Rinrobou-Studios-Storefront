@@ -978,3 +978,42 @@ button {
   background: #21164d;
   color: var(--mint);
 }
+
+/* About Us CSS */
+.whatWeOffer {
+  color: #CEC3FF;
+  text-align: center;
+  font-family: "Love Light", cursive;
+  font-size: 128px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  
+}
+
+.whoWeAre {
+  color: #FFB4CD;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.74);
+  font-family: "Love Light";
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.artStyle {
+  color: #FFF;
+  text-align: center;
+  font-family: Poppins;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: normal;
+}
+
+.whoWeAreBackground {
+  background-image: url("../src/assets/about-us-background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat
+}
