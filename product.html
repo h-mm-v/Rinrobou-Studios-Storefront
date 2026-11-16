@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,14 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="product.css">
 </head>
+
 <body>
   <header class="navbar">
     <nav class="nav-links">
       <a href="homepage.html">Home</a>
       <a href="catalog.html">Catalog</a>
       <a href="portfolio.html">Portfolio</a>
-      <a href="src/pages/AboutUsPage.tsx">About Us</a>
+      <a href="src/pages/AboutUsPage.html">About Us</a>
     </nav>
 
     <a href="homepage.html" class="nav-logo">
@@ -22,11 +24,7 @@
 
     <div class="nav-icons">
       <button class="icon-button" aria-label="Account">
-        <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="8" r="3.5"></circle>
           <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
         </svg>
@@ -49,24 +47,39 @@
         </div>
 
         <div class="product-main-image">
-          <button class="gallery-arrow prev"
-                  type="button"
-                  aria-label="Previous image">❮</button>
+          <button class="gallery-arrow prev" type="button" aria-label="Previous image">❮</button>
 
-          <div id="current-product-image"
-              class="product-image-placeholder">
+          <div id="current-product-image" class="product-image-placeholder">
             Product Image 1
           </div>
 
-          <button class="gallery-arrow next"
-                  type="button"
-                  aria-label="Next image">❯</button>
+          <button class="gallery-arrow next" type="button" aria-label="Next image">❯</button>
         </div>
       </div>
 
       <!-- Product Information -->
       <div class="product-info">
-
+        <div class="product-actions">
+          <!-- Share -->
+          <button type="button" id="share-product" class="share-product" aria-label="Share product"
+            title="Share product">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path d="m8.7 13.5 6.6 4" />
+              <path d="m15.3 6.5-6.6 4" />
+            </svg>
+          </button>
+          <button type="button" id="bookmark-product" class="bookmark-product" aria-label="Save product"
+            aria-pressed="false">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+        </div>
         <span class="product-category">PRODUCT CATEGORY</span>
         <h1>Product Name</h1>
 
@@ -121,47 +134,39 @@
           </label>
         </div>
 
-        <button id="join-waitlist"
-                class="join-waitlist"
-                disabled hidden>
+        <button id="join-waitlist" class="join-waitlist" disabled hidden>
           Join Waitlist
         </button>
 
         <!-- Commissions Open -->
         <div class="commissions-open-card" id="commissions-open-card">
-            <h3>COMMISSIONS ARE OPEN!</h3>
+          <h3>COMMISSIONS ARE OPEN!</h3>
 
-            <p>
-                We're currently accepting new commissions!
-            </p>
+          <p>
+            We're currently accepting new commissions!
+          </p>
 
-            <p>
-                Submit your request to get started.
-            </p>
+          <p>
+            Submit your request to get started.
+          </p>
 
-            <p class="waitlist-instruction">
-              Please accept terms to place an order
-            </p>
+          <p class="waitlist-instruction">
+            Please accept terms to place an order
+          </p>
 
-            <label class="terms-checkbox">
-              <input type="checkbox" id="accept-commission-terms">
-              <span>
-                  I accept
-                  <a href="terms-of-service.html">
-                      RinRobou Studio's Terms of Service
-                  </a>
-              </span>
-            </label>
+          <label class="terms-checkbox">
+            <input type="checkbox" id="accept-commission-terms">
+            <span>
+              I accept
+              <a href="terms-of-service.html">
+                RinRobou Studio's Terms of Service
+              </a>
+            </span>
+          </label>
 
-            <a 
-              href="commission.html" 
-              class="order-now-button"
-              id="order-now"
-              aria-disabled="true"
-              tabindex="-1"
-              >
-                ORDER NOW
-            </a>
+          <a href="commission.html" class="order-now-button" id="order-now" aria-disabled="true" tabindex="-1">
+            ORDER NOW
+          </a>
         </div>
         <p id="waitlist-message" role="status"></p>
       </div>
@@ -171,17 +176,11 @@
     <div class="product-bottom">
 
       <div class="product-tabs">
-        <button class="product-tab active"
-                type="button"
-                data-tab="description">DESCRIPTION</button>
+        <button class="product-tab active" type="button" data-tab="description">DESCRIPTION</button>
 
-        <button class="product-tab"
-                type="button"
-                data-tab="details">DETAILS</button>
+        <button class="product-tab" type="button" data-tab="details">DETAILS</button>
 
-        <button class="product-tab"
-                type="button"
-                data-tab="reviews">REVIEWS</button>
+        <button class="product-tab" type="button" data-tab="reviews">REVIEWS</button>
       </div>
 
       <div id="product-tab-content">
@@ -205,11 +204,8 @@
             </div>
 
             <div class="description-image-container">
-              <img
-                src="./src/assets/product-description.png"
-                alt="RinRobou Studios commission artwork"
-                class="description-art"
-              >
+              <img src="./src/assets/product-description.png" alt="RinRobou Studios commission artwork"
+                class="description-art">
             </div>
           </div>
         </section>
@@ -243,11 +239,7 @@
             </div>
 
             <div class="details-image-container">
-              <img
-                src="./src/assets/product-details.png"
-                alt="RinRobou Studios commission artwork"
-                class="details-art"
-              >
+              <img src="./src/assets/product-details.png" alt="RinRobou Studios commission artwork" class="details-art">
             </div>
           </div>
         </section>
@@ -302,11 +294,8 @@
 
               <div class="overall-rating">
                 <div class="reviews-avatar-container">
-                  <img
-                    src="./src/assets/product-reviews.png"
-                    alt="RinRobou Studios commission artwork"
-                    class="reviews-page-art"
-                  >
+                  <img src="./src/assets/product-reviews.png" alt="RinRobou Studios commission artwork"
+                    class="reviews-page-art">
                 </div>
                 <p>⭐ 5.0 – 2 reviews</p>
               </div>
@@ -361,42 +350,35 @@
 
   </main>
   <footer class="footer" id="about">
-      <div class="footer-brand">
-        <img
-          src="src/assets/logo-large.png"
-          alt="RinRobou Studios"
-          class="footer-logo"
-        />
+    <div class="footer-brand">
+      <img src="src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
 
-        <div class="footer-columns">
-          <div>
-            <strong>(951)-208-5524</strong>
-            <p>rinroboustudios@gmail.com</p>
-            <p>Burbank, CA</p>
-          </div>
-
-          <div>
-            <strong>Business Hours</strong>
-            <p>MONDAY - FRIDAY</p>
-            <p>9:00 AM - 5:00 PM</p>
-          </div>
+      <div class="footer-columns">
+        <div>
+          <strong>(951)-208-5524</strong>
+          <p>rinroboustudios@gmail.com</p>
+          <p>Burbank, CA</p>
         </div>
 
-        <div class="social-links">
-          <a href="#" aria-label="X">X</a>
-          <a href="#" aria-label="Instagram">◎</a>
-          <a href="#" aria-label="Pinterest">P</a>
+        <div>
+          <strong>Business Hours</strong>
+          <p>MONDAY - FRIDAY</p>
+          <p>9:00 AM - 5:00 PM</p>
         </div>
       </div>
 
-      <img
-        src="src/assets/footer-art.png"
-        alt="RinRobou character artwork"
-        class="footer-art"
-      />
+      <div class="social-links">
+        <a href="#" aria-label="X">X</a>
+        <a href="#" aria-label="Instagram">◎</a>
+        <a href="#" aria-label="Pinterest">P</a>
+      </div>
+    </div>
 
-      <small>©2027 RinRobou Studios, All Rights Reserved</small>
+    <img src="src/assets/footer-art.png" alt="RinRobou character artwork" class="footer-art" />
+
+    <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
   <script type="module" src="./product.js"></script>
 </body>
+
 </html>

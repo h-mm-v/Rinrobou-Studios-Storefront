@@ -126,6 +126,105 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateImage(0);
 
+    /* Bookmark */
+    const bookmarkButton = document.querySelector<HTMLButtonElement>(
+        "#bookmark-product"
+    );
+
+    const productId = new URLSearchParams(
+        window.location.search
+    ).get("id") ?? "1";
+
+    const storageKey = "savedProducts";
+
+    function getSavedProducts(): string[] {
+        try {
+            const stored = localStorage.getItem(storageKey);
+            const parsed: unknown = stored ? JSON.parse(stored) : [];
+
+            return Array.isArray(parsed)
+                ? parsed.filter((id): id is string => typeof id === "string")
+                : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function updateBookmark(): void {
+        if (!bookmarkButton) return;
+
+        const isSaved = getSavedProducts().includes(productId);
+
+        bookmarkButton.classList.toggle("saved", isSaved);
+        bookmarkButton.setAttribute("aria-pressed", String(isSaved));
+        bookmarkButton.setAttribute(
+            "aria-label",
+            isSaved ? "Remove saved product" : "Save product"
+        );
+    }
+
+    bookmarkButton?.addEventListener("click", () => {
+        const savedProducts = getSavedProducts();
+
+        const updated = savedProducts.includes(productId)
+            ? savedProducts.filter(id => id !== productId)
+            : [...savedProducts, productId];
+
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(updated));
+            updateBookmark();
+        } catch (error) {
+            console.error("Could not save bookmark:", error);
+        }
+    });
+
+    updateBookmark();
+
+    /* Share Product */
+    const shareButton = document.querySelector<HTMLButtonElement>(
+        "#share-product"
+    );
+
+    const shareMessage = document.querySelector<HTMLElement>(
+        "#share-message"
+    );
+
+    shareButton?.addEventListener("click", async () => {
+        const productName =
+            document.querySelector<HTMLElement>("#product-name")
+                ?.textContent?.trim() || "RinRobou Studios Product";
+
+        const productUrl = window.location.href;
+
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: productName,
+                    url: productUrl
+                });
+
+                return;
+            }
+
+            await navigator.clipboard.writeText(productUrl);
+
+            if (shareMessage) {
+                shareMessage.textContent = "Product link copied!";
+            }
+        } catch (error) {
+            if (error instanceof DOMException &&
+                error.name === "AbortError") {
+                return;
+            }
+
+            console.error("Unable to share product:", error);
+
+            if (shareMessage) {
+                shareMessage.textContent = "Unable to share product.";
+            }
+        }
+    });
+
     /* Commission Terms */
     const commissionCheckbox =
         document.querySelector<HTMLInputElement>(
@@ -165,4 +264,4 @@ document.addEventListener("DOMContentLoaded", () => {
     updateOrderButton();
 
 });
-export {};
+export { };
