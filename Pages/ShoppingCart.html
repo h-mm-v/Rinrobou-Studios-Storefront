@@ -13,13 +13,13 @@
 <body>
     <header class="navbar">
         <nav class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#catalog">Catalog</a>
-            <a href="#portfolio">Portfolio</a>
-            <a href="#about">About Us</a>
+            <a href="../homepage.html">Home</a>
+            <a href="../catalog.html">Catalog</a>
+            <a href="../portfolio.html">Portfolio</a>
+            <a href="../src/pages/AboutUsPage.html">About Us</a>
         </nav>
 
-        <a href="#home" class="nav-logo">
+        <a href="../homepage.html" class="nav-logo">
             <img src="../src/assets/logo-small.png" alt="RinRobou Studios" />
         </a>
 
@@ -31,38 +31,35 @@
                 </svg>
             </button>
             <button aria-label="Search">⌕</button>
-            <button aria-label="Shopping cart">🛒</button>
+            <a href="ShoppingCart.html"><button aria-label="Shopping cart">🛒</button></a>
         </div>
     </header>
 
     <main class="ShoppingCart-Background">
         <div class="ShoppingCartContainer">
             <h1>Your Cart</h1>
-            <label class = "CheckBox">
+            <label class="CheckBox">
                 <!--NEED TO FIX CHECKBOX LOCATION-->
                 Select all
-                <input type="checkbox" class="Checkbox" required>
+                <input type="checkbox" class="Checkbox" id="select-all-cart-items">
             </label>
             <hr class="ShoppingCartTopDivider">
         </div>
+        <div id="cart-items" aria-live="polite"></div>
+        <p id="cart-page-status" role="status" aria-live="polite"></p>
 
-
-
-
-        <form class="CheckOutForm">
+        <form class="CheckOutForm" id="cart-checkout-form">
             <div class="CheckoutSubtotal">
                 <p>
-                    Subtotal ([item_amt]): $[sub_cost]
+                    Subtotal (<span id="cart-item-count">0</span>): <span id="cart-subtotal">$0.00</span>
                 </p>
                 <label>
-                    <input type="checkbox" class="Checkbox" required>
+                    <input type="checkbox" class="Checkbox" id="confirm-cart-order" required>
                     Confirm Order
                 </label>
             </div>
             <div class="ProceedToCheckoutButton">
-                <button type="submit" class="button">
-                    <a href="../checkout.html">Proceed to Checkout</a>
-                </button>
+                <button type="submit" class="button" disabled>Proceed to Checkout</button>
             </div>
         </form>
     </main>
@@ -96,6 +93,7 @@
 
         <small>©2027 RinRobou Studios, All Rights Reserved</small>
     </footer>
+    <script type="module" src="/storefront-cart.js"></script>
 </body>
 
 </html>

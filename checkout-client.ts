@@ -13,6 +13,7 @@ interface ProductCatalog {
 interface CartItem {
   id: string;
   quantity: number;
+  selected?: boolean;
 }
 
 interface CheckoutProduct extends Product {
@@ -30,6 +31,7 @@ interface CheckoutResponse {
 }
 
 const cartKey = 'rinrobou-cart';
+const pendingCheckoutKey = 'rinrobou-pending-checkout-items';
 
 const form = document.querySelector<HTMLFormElement>('#checkout-form');
 const statusMessage = document.querySelector<HTMLElement>('#checkout-status');
@@ -67,7 +69,8 @@ function getCart(): CartItem[] {
       !item.id ||
       !Number.isInteger(item.quantity) ||
       Number(item.quantity) < 1 ||
-      Number(item.quantity) > 10
+      Number(item.quantity) > 10 ||
+      item.selected === false
     ) {
       continue;
     }
@@ -176,7 +179,41 @@ async function verifyPaymentStatus(url: string): Promise<void> {
     }
 
     if (result.status === 'paid') {
-      localStorage.removeItem(cartKey);
+      const purchasedItems = checkoutProducts.map(({ id, quantity }) => ({ id, quantity }));
+      try {
+        const pending = sessionStorage.getItem(pendingCheckoutKey);
+        const pendingItems: unknown = pending ? JSON.parse(pending) : purchasedItems;
+        const quantities = new Map<string, number>();
+        if (Array.isArray(pendingItems)) {
+          for (const item of pendingItems) {
+            if (typeof item === 'object' && item !== null) {
+              const candidate = item as Record<string, unknown>;
+              if (typeof candidate.id === 'string' && Number.isInteger(candidate.quantity)) {
+                quantities.set(candidate.id, Number(candidate.quantity));
+              }
+            }
+          }
+        }
+        const currentCart = JSON.parse(localStorage.getItem(cartKey) ?? '[]') as unknown;
+        const remaining = Array.isArray(currentCart)
+          ? currentCart.flatMap((item) => {
+              if (typeof item !== 'object' || item === null) return [];
+              const candidate = item as Record<string, unknown>;
+              if (typeof candidate.id !== 'string' || !Number.isInteger(candidate.quantity)) return [];
+              const quantity = Number(candidate.quantity) - (quantities.get(candidate.id) ?? 0);
+              quantities.delete(candidate.id);
+              return quantity > 0 ? [{ ...candidate, quantity }] : [];
+            })
+          : [];
+        if (remaining.length > 0) localStorage.setItem(cartKey, JSON.stringify(remaining));
+        else localStorage.removeItem(cartKey);
+        sessionStorage.removeItem(pendingCheckoutKey);
+      } catch {
+        setStatus('Payment completed, but your cart could not be updated. Please review it before ordering again.');
+        isVerifyingPayment = false;
+        updateSubmitButton();
+        return;
+      }
       checkoutProducts = [];
       isVerifyingPayment = false;
       setStatus('Payment complete. Thank you for your order!');
@@ -276,6 +313,10 @@ form?.addEventListener('submit', async (event) => {
   setStatus(`Starting ${methodName} checkout...`);
 
   try {
+    sessionStorage.setItem(
+      pendingCheckoutKey,
+      JSON.stringify(checkoutProducts.map(({ id, quantity }) => ({ id, quantity }))),
+    );
     const termsElement = form.querySelector<HTMLInputElement>('[name="terms-accepted"]');
     const data = new FormData(form);
     const payload = Object.fromEntries(data.entries());

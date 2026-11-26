@@ -16,6 +16,8 @@ app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'c
 app.get('/commission.html', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.html')));
 app.get('/checkout.html', (_request, response) => response.sendFile(path.join(projectRoot, 'checkout.html')));
 app.get('/catalog.html', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
+app.get('/Pages/ShoppingCart.html', (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'Pages', 'ShoppingCart.html')));
 app.get('/commission.css', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.css')));
 app.get('/checkout.css', (_request, response) => response.sendFile(path.join(projectRoot, 'checkout.css')));
 app.get('/style.css', (_request, response) => response.sendFile(path.join(projectRoot, 'style.css')));
@@ -41,6 +43,7 @@ function serveTypeScriptClient(sourceFile: string) {
 
 app.get('/commission-client.js', serveTypeScriptClient('commission-client.ts'));
 app.get('/checkout-client.js', serveTypeScriptClient('checkout-client.ts'));
+app.get('/storefront-cart.js', serveTypeScriptClient('storefront-cart.ts'));
 
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
   console.error('Storefront server error:', error);

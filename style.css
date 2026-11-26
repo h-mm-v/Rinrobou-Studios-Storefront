@@ -789,6 +789,59 @@ button {
   cursor: pointer;
 }
 
+.ShoppingCart-Background input[type="checkbox"] {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  margin: 0 0.45em 0 0;
+  vertical-align: middle;
+  border: 2px solid var(--mint);
+  border-radius: 7px;
+  background: rgb(23 15 54 / 90%);
+  box-shadow: 0 0 0 2px rgb(145 230 213 / 12%);
+  cursor: pointer;
+}
+
+.ShoppingCart-Background input[type="checkbox"]:checked {
+  border-color: var(--pink);
+  background: var(--pink);
+}
+
+.ShoppingCart-Background input[type="checkbox"]:checked::after {
+  display: block;
+  width: 8px;
+  height: 14px;
+  margin: 3px 0 0 9px;
+  border: solid var(--purple);
+  border-width: 0 3px 3px 0;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.ShoppingCart-Background input[type="checkbox"]:indeterminate {
+  border-color: var(--pink);
+  background: var(--pink);
+}
+
+.ShoppingCart-Background input[type="checkbox"]:indeterminate::after {
+  display: block;
+  width: 14px;
+  height: 3px;
+  margin: 12px auto;
+  border-radius: 2px;
+  background: var(--purple);
+  content: "";
+}
+
+.ShoppingCart-Background input[type="checkbox"]:hover {
+  border-color: var(--pink);
+}
+
+.ShoppingCart-Background input[type="checkbox"]:focus-visible {
+  outline: 3px solid rgb(145 230 213 / 45%);
+  outline-offset: 3px;
+}
+
 .ShoppingCartTopDivider {
   stroke: #9AF2D6;
   margin-right: 50%;
