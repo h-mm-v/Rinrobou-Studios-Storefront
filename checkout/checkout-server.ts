@@ -129,7 +129,7 @@ const currency = 'USD';
 function getPublicBaseUrl(): string {
   const value = process.env.PUBLIC_BASE_URL?.trim();
   if (!value) {
-    throw new Error('Set PUBLIC_BASE_URL in databaseDetails.env before enabling checkout.');
+    throw new Error('Set PUBLIC_BASE_URL in .env before enabling checkout.');
   }
 
   let url: URL;
@@ -151,7 +151,7 @@ function getPublicBaseUrl(): string {
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY?.trim();
   if (!key) {
-    throw new Error('Stripe checkout is not configured. Set STRIPE_SECRET_KEY in databaseDetails.env.');
+    throw new Error('Stripe checkout is not configured. Set STRIPE_SECRET_KEY in .env.');
   }
   if (key.startsWith('sk_live_') &&
       (process.env.ENABLE_LIVE_PAYMENTS !== 'true' || process.env.LIVE_PRICING_CONFIRMED !== 'true')) {
