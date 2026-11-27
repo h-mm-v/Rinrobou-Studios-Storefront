@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS orders (
   shipping_state VARCHAR(100) NOT NULL,
   shipping_postal_code VARCHAR(20) NOT NULL,
   shipping_country CHAR(2) NOT NULL,
-  payment_method ENUM('stripe', 'paypal', 'venmo') NOT NULL,
+  payment_method ENUM('stripe') NOT NULL,
   provider_order_id VARCHAR(255) NULL,
   currency CHAR(3) NOT NULL,
   subtotal_cents BIGINT UNSIGNED NOT NULL,

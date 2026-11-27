@@ -12,7 +12,7 @@ app.disable('x-powered-by');
 app.use(commissionRouter);
 app.use(checkoutRouter);
 
-app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'commission', 'index.html')));
+app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
 app.get(['/commission', '/commission/', '/commission.html'], (_request, response) =>
   response.sendFile(path.join(projectRoot, 'commission', 'index.html')));
 app.get(['/checkout', '/checkout/', '/checkout.html'], (_request, response) =>

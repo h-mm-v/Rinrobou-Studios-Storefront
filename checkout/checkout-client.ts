@@ -282,7 +282,7 @@ for (const button of paymentButtons) {
   button.addEventListener('click', () => {
     if (!paymentMethodInput) return;
     const selectedMethod = button.dataset.paymentMethod;
-    if (!selectedMethod || !['paypal', 'venmo', 'stripe'].includes(selectedMethod)) return;
+    if (!selectedMethod || selectedMethod !== 'stripe') return;
 
     paymentMethodInput.value = selectedMethod;
     for (const candidate of paymentButtons) {
@@ -301,7 +301,7 @@ form?.addEventListener('submit', async (event) => {
     return;
   }
   if (!paymentMethodInput.value) {
-    setStatus('Choose PayPal, Venmo, or Stripe to continue.');
+    setStatus('Choose Stripe to continue.');
     return;
   }
 
