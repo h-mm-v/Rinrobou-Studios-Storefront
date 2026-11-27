@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "catalog.html";
         }
     });
-    
+
     /* Licensing */
     const basePrice = 65; // temp
 
@@ -83,10 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
     changeTab("description");
 
     /* Product Carousel */
-    const productImages: string[] = [
-        "Product Image 1",
-        "Product Image 2",
-        "Product Image 3"
+    let productImages: string[] = [
+        "/src/assets/halfchibi 1.png",
+        "/src/assets/halfchibi 2.png",
+        "/src/assets/halfchibi 3.png"
     ];
 
     let currentImageIndex = 0;
@@ -95,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "#current-product-image"
     );
 
-    const thumbnails = document.querySelectorAll<HTMLButtonElement>(
-        ".product-page .thumbnail"
+    const thumbnails = document.querySelector<HTMLElement>(
+        "#product-thumbnails"
     );
 
     const prevButton = document.querySelector<HTMLButtonElement>(
@@ -108,26 +108,73 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     function updateImage(index: number): void {
+        if (!mainImage || !thumbnails) return;
+
+        if (productImages.length === 0) {
+            mainImage.textContent = "No image available";
+            thumbnails.replaceChildren();
+            return;
+        }
+
         currentImageIndex =
             (index + productImages.length) % productImages.length;
 
-        if (mainImage) {
-            mainImage.textContent = productImages[currentImageIndex];
-        }
+        const image = document.createElement("img");
+        image.src = productImages[currentImageIndex];
+        image.alt = `Product image ${currentImageIndex + 1}`;
 
-        thumbnails.forEach((thumbnail, i) => {
+        mainImage.replaceChildren(image);
+
+        thumbnails.querySelectorAll<HTMLButtonElement>(
+            ".thumbnail"
+        ).forEach((thumbnail, i) => {
             const active = i === currentImageIndex;
 
             thumbnail.classList.toggle("active", active);
             thumbnail.setAttribute("aria-pressed", String(active));
+
+            if (active) {
+                thumbnail.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            }
         });
     }
 
-    thumbnails.forEach((thumbnail, index) => {
-        thumbnail.addEventListener("click", () => {
-            updateImage(index);
+    function updateGallery(images: string[]): void {
+        productImages = images;
+        currentImageIndex = 0;
+
+        if (!thumbnails) return;
+
+        thumbnails.replaceChildren();
+
+        productImages.forEach((imagePath, index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "thumbnail";
+            button.setAttribute(
+                "aria-label",
+                `View product image ${index + 1}`
+            );
+
+            const image = document.createElement("img");
+            image.src = imagePath;
+            image.alt = "";
+
+            button.appendChild(image);
+
+            button.addEventListener("click", () => {
+                updateImage(index);
+            });
+
+            thumbnails.appendChild(button);
         });
-    });
+
+        updateImage(0);
+    }
 
     prevButton?.addEventListener("click", () => {
         updateImage(currentImageIndex - 1);
@@ -137,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateImage(currentImageIndex + 1);
     });
 
-    updateImage(0);
+    updateGallery(productImages);
 
     /* Bookmark */
     const bookmarkButton = document.querySelector<HTMLButtonElement>(
