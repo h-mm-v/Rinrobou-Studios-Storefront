@@ -186,6 +186,156 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateGallery(productImages);
 
+    /* Image Lightbox */
+    const lightbox = document.querySelector<HTMLElement>(
+        "#image-lightbox"
+    );
+
+    const lightboxImage = document.querySelector<HTMLImageElement>(
+        "#lightbox-image"
+    );
+
+    const lightboxCounter = document.querySelector<HTMLElement>(
+        "#lightbox-counter"
+    );
+
+    const closeLightboxButton = document.querySelector<HTMLButtonElement>(
+        "#close-lightbox"
+    );
+
+    const lightboxPrev = document.querySelector<HTMLButtonElement>(
+        "#lightbox-prev"
+    );
+
+    const lightboxNext = document.querySelector<HTMLButtonElement>(
+        "#lightbox-next"
+    );
+
+    let lightboxOpen = false;
+    let previousFocus: HTMLElement | null = null;
+
+    function updateLightboxImage(): void {
+        if (!lightboxImage || productImages.length === 0) return;
+
+        lightboxImage.src = productImages[currentImageIndex];
+        lightboxImage.alt = `Product image ${currentImageIndex + 1}`;
+
+        if (lightboxCounter) {
+            lightboxCounter.replaceChildren();
+
+            productImages.forEach((_, index) => {
+                const dot = document.createElement("button");
+
+                dot.type = "button";
+                dot.className = "lightbox-dot";
+                dot.setAttribute(
+                    "aria-label",
+                    `View image ${index + 1}`
+                );
+
+                const active = index === currentImageIndex;
+
+                dot.classList.toggle("active", active);
+                dot.setAttribute("aria-pressed", String(active));
+
+                dot.addEventListener("click", () => {
+                    updateImage(index);
+                    updateLightboxImage();
+                });
+
+                lightboxCounter.appendChild(dot);
+            });
+        }
+    }
+
+    function openLightbox(): void {
+        if (!lightbox || productImages.length === 0) return;
+
+        previousFocus = document.activeElement as HTMLElement | null;
+        lightbox.hidden = false;
+        lightboxOpen = true;
+
+        document.body.style.overflow = "hidden";
+
+        updateLightboxImage();
+        closeLightboxButton?.focus();
+    }
+
+    function closeLightbox(): void {
+        if (!lightbox) return;
+
+        lightbox.hidden = true;
+        lightboxOpen = false;
+
+        document.body.style.overflow = "";
+        previousFocus?.focus();
+    }
+
+    mainImage?.addEventListener("click", () => {
+        openLightbox();
+    });
+
+    closeLightboxButton?.addEventListener("click", closeLightbox);
+
+    lightboxPrev?.addEventListener("click", () => {
+        updateImage(currentImageIndex - 1);
+        updateLightboxImage();
+    });
+
+    lightboxNext?.addEventListener("click", () => {
+        updateImage(currentImageIndex + 1);
+        updateLightboxImage();
+    });
+
+    lightbox?.addEventListener("click", (event) => {
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (!lightboxOpen) return;
+
+        if (event.key === "Escape") {
+            closeLightbox();
+        }
+
+        if (event.key === "ArrowLeft") {
+            updateImage(currentImageIndex - 1);
+            updateLightboxImage();
+        }
+
+        if (event.key === "ArrowRight") {
+            updateImage(currentImageIndex + 1);
+            updateLightboxImage();
+        }
+
+        if (event.key === "Tab") {
+            const controls = [
+                closeLightboxButton,
+                lightboxPrev,
+                lightboxNext
+            ].filter((button): button is HTMLButtonElement =>
+                button !== null && !button.disabled
+            );
+
+            if (controls.length === 0) return;
+
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+
+            if (event.shiftKey &&
+                document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey &&
+                document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
     /* Bookmark */
     const bookmarkButton = document.querySelector<HTMLButtonElement>(
         "#bookmark-product"

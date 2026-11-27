@@ -9,6 +9,28 @@
   <link rel="stylesheet" href="product.css">
 </head>
 
+<!-- Image Viewer -->
+<div id="image-lightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Product image viewer"
+  hidden>
+  <button type="button" id="close-lightbox" class="lightbox-close" aria-label="Close image viewer">
+    &times;
+  </button>
+
+  <button type="button" id="lightbox-prev" class="lightbox-arrow lightbox-prev" aria-label="Previous image">
+    ❮
+  </button>
+
+  <div class="lightbox-image-container">
+    <img id="lightbox-image" src="" alt="Enlarged product image">
+  </div>
+
+  <button type="button" id="lightbox-next" class="lightbox-arrow lightbox-next" aria-label="Next image">
+    ❯
+  </button>
+
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+</div>
+
 <body>
   <header class="navbar">
     <nav class="nav-links">
