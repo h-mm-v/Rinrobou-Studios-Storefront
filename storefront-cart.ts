@@ -198,10 +198,7 @@ if (cartItemsContainer) {
         details.className = 'cart-item-details';
         const name = document.createElement('h2');
         name.textContent = product.name;
-        const price = document.createElement('p');
-        price.className = 'cart-item-unit-price';
-        price.textContent = `${displayAmount(product.priceCents)} each`;
-        details.append(name, price);
+        details.append(name);
 
         const actions = document.createElement('div');
         actions.className = 'cart-item-actions';
@@ -219,16 +216,21 @@ if (cartItemsContainer) {
         quantity.setAttribute('aria-label', `Quantity for ${product.name}`);
         quantityLabel.append(quantityText, quantity);
 
+        const pricing = document.createElement('div');
+        pricing.className = 'cart-item-pricing';
+        const calculation = document.createElement('span');
+        calculation.textContent = `${displayAmount(product.priceCents)} × ${item.quantity} =`;
         const lineTotal = document.createElement('strong');
         lineTotal.className = 'cart-item-line-total';
         lineTotal.textContent = displayAmount(product.priceCents * item.quantity);
+        pricing.append(calculation, lineTotal);
 
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'cart-item-remove';
         remove.textContent = 'Remove';
         remove.setAttribute('aria-label', `Remove ${product.name} from your cart`);
-        actions.append(quantityLabel, lineTotal, remove);
+        actions.append(quantityLabel, pricing, remove);
 
         row.append(selection, image, details, actions);
         cartItems.append(row);

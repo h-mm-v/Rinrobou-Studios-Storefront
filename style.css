@@ -1002,7 +1002,7 @@ button {
 
 .cart-item {
   display: grid;
-  grid-template-columns: 42px 132px minmax(180px, 1fr) 150px;
+  grid-template-columns: 42px 132px minmax(180px, 1fr) minmax(150px, max-content);
   align-items: center;
   gap: 18px;
   min-height: 168px;
@@ -1075,6 +1075,16 @@ button {
   color: white;
   font-size: 15px;
   text-align: center;
+}
+
+.cart-item-pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+  color: var(--mint);
+  font-size: 14px;
 }
 
 .cart-item-line-total {
