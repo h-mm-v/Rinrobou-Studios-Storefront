@@ -56,6 +56,14 @@
     margin: 0 auto;
 }
 
+/* Image Protection */
+.product-page img,
+.image-lightbox img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 /* Image Gallery */
 .product-page .product-gallery {
     display: grid;

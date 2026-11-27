@@ -186,6 +186,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateGallery(productImages);
 
+    /* Image Protection */
+
+    document.addEventListener("contextmenu", (event) => {
+        const target = event.target;
+
+        if (
+            target instanceof HTMLImageElement &&
+            target.closest(".product-page, .image-lightbox")
+        ) {
+            event.preventDefault();
+        }
+    });
+
     /* Image Lightbox */
     const lightbox = document.querySelector<HTMLElement>(
         "#image-lightbox"
@@ -474,4 +487,16 @@ document.addEventListener("DOMContentLoaded", () => {
     updateOrderButton();
 
 });
+
+document.addEventListener("dragstart", (event) => {
+    const target = event.target;
+
+    if (
+        target instanceof HTMLImageElement &&
+        target.closest(".product-page, .image-lightbox")
+    ) {
+        event.preventDefault();
+    }
+});
+
 export { };
