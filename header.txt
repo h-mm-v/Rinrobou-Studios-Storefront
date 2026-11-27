@@ -1,3 +1,5 @@
+<!-- with fixed SVG -->
+
 <header class="navbar">
     <nav class="nav-links">
       <a href="homepage.html">Home</a>

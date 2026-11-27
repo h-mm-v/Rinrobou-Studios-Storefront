@@ -15,7 +15,7 @@
 
     .catalog-tools {
       display: grid;
-      grid-template-columns: 145px minmax(0, 1fr) 54px;
+      grid-template-columns: minmax(0, 1fr) 54px;
       gap: 14px;
       margin-bottom: 16px;
     }
@@ -302,34 +302,30 @@
       color: white;
     }
 
-    @media (max-width: 800px) {
-      .catalog-tools {
-        grid-template-columns: 1fr auto;
-      }
-
-      .catalog-brand {
-        width: 110px;
-      }
-
-      .search-box {
-        grid-column: 1 / -1;
-        grid-row: 2;
-      }
-
-      .search-submit {
-        grid-column: 2;
-        grid-row: 1;
-      }
-
-      .filters-row {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .search-results-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+   @media (max-width: 800px) {
+    .catalog-tools {
+      grid-template-columns: minmax(0, 1fr) 54px;
     }
+
+    .search-box {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .search-submit {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .filters-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .search-results-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 
     @media (max-width: 550px) {
       .search-results-page {
@@ -416,7 +412,7 @@
 
   <main class="search-results-page">
     <section class="catalog-tools" aria-label="Catalog search tools">
-        <div class="categories-menu">
+        <!--<div class="categories-menu">
             <button 
                 id="categories-button"
                 class="categories-button"
@@ -427,17 +423,35 @@
             </button>
 
             <div id="categories-dropdown" class="categories-dropdown">
-                <a href="SearchResultsPage.html?category=animals">Animals</a>
-                <a href="SearchResultsPage.html?category=anime">Anime Style</a>
-                <a href="SearchResultsPage.html?category=character">Character Design</a>
-                <a href="SearchResultsPage.html?category=graphic">Graphic Design</a>
-                <a href="SearchResultsPage.html?category=mvs">MVs</a>
-                <a href="SearchResultsPage.html?category=gifts">Gifts</a>
+              <a href="SearchResultsPage.html?category=Anime%20Style">
+                Anime Style
+              </a>
+
+              <a href="SearchResultsPage.html?category=Anime%20Style%20Skeb">
+                Anime Style Skeb
+              </a>
+
+              <a href="SearchResultsPage.html?category=Character%20Design">
+                Character Design
+              </a>
+
+              <a href="SearchResultsPage.html?category=Graphic%20Design">
+                Graphic Design
+              </a>
+
+              <a href="SearchResultsPage.html?category=MVs">
+                MVs
+              </a>
+
+              <a href="SearchResultsPage.html?category=Gifts">
+                Gifts
+              </a>
             </div>
-        </div>
+        </div> -->
 
       <form class="search-box" action="#" method="get">
         <input
+          id="search-input"
           type="search"
           name="search"
           placeholder="Search for anything"
@@ -452,175 +466,90 @@
 
     <section class="filters-row" aria-label="Product filters">
       <div class="filter-list">
-        <button 
-            id="all-filters-button"
-            class="filter-chip"
-            type="button"
-            aria-expanded="false"
-            >
-            ☷ All Filters
+        <button
+          id="all-filters-button"
+          class="filter-chip"
+          type="button"
+          aria-expanded="false"
+        >
+          ☷ All Filters
         </button>
-        <button class="filter-chip" type="button">Under $50</button>
-        <button class="filter-chip" type="button">Limited Time</button>
-        <button class="filter-chip" type="button">Pre-Orders</button>
-        <button class="filter-chip" type="button">Holiday</button>
-        <button class="filter-chip" type="button">Prints</button>
-        <button class="filter-chip" type="button">Acrylics</button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="maxPrice"
+          data-value="50"
+        >
+          Under $50
+        </button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="limitedTime"
+          data-value="true"
+        >
+          Limited Time
+        </button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="preOrders"
+          data-value="true"
+        >
+          Pre-Orders
+        </button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="holiday"
+          data-value="true"
+        >
+          Holiday
+        </button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="format"
+          data-value="Prints"
+        >
+          Prints
+        </button>
+
+        <button
+          class="filter-chip quick-filter"
+          type="button"
+          data-filter="format"
+          data-value="Acrylics"
+        >
+          Acrylics
+        </button>
       </div>
 
       <label class="sort-control">
-        <select aria-label="Sort products">
-          <option>Most Relevant</option>
-          <option>Newest</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
+        <select id="sort-products" aria-label="Sort products">
+          <option value="relevant">Most Relevant</option>
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
         </select>
       </label>
     </section>
 
-    <section class="search-results-grid" aria-label="Search results">
-      <article class="product-card">
-        <img src="src/assets/donut-float.png" alt="Donut Floatie Chibi" />
-        <div class="product-info">
-          <p class="product-label">SUMMER TIME EXCLUSIVE</p>
-          <h3>Donut Floatie Chibi</h3>
-          <p class="rating">★★★★★ <span>(33)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
+    <section
+      id="product-grid"
+      class="search-results-grid"
+      aria-label="Search results"
+    ></section>
 
-      <article class="product-card">
-        <img src="src/assets/butler-mage.png" alt="Butler and Maid Cafe Polaroid" />
-        <div class="product-info">
-          <p class="product-label">LIMITED TIME EXCLUSIVE</p>
-          <h3>Butler &amp; Maid Cafe Polaroid</h3>
-          <p class="rating">★★★★★ <span>(25)</span></p>
-          <p class="price">$55.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/halloween-chibi.png" alt="Halloween Costume Chibi" />
-        <div class="product-info">
-          <p class="product-label">HALLOWEEN EXCLUSIVE</p>
-          <h3>Halloween Costume Chibi</h3>
-          <p class="rating">★★★★★ <span>(7)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/valentines-chibi.png" alt="Pokemon Onesies Chibi" />
-        <div class="product-info">
-          <p class="product-label">VALENTINE'S DAY EXCLUSIVE</p>
-          <h3>Pokemon Onesies Chibi</h3>
-          <p class="rating">★★★★★ <span>(10)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/DNDAnimeStyleSkeb.png" alt="DND Anime Style Skeb" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE SKEB</p>
-          <h3>DND Anime Style Skeb</h3>
-          <p class="rating">★★★★★ <span>(3)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/ValentinesDayChibi.png" alt="Valentine's Day Chibi" />
-        <div class="product-info">
-          <p class="product-label">LIMITED TIME EXCLUSIVE</p>
-          <h3>Valentine's Day Chibi</h3>
-          <p class="rating">★★★★★ <span>(12)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/MVFullBody.png" alt="MV Full Body artwork" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE</p>
-          <h3>MV Full Body</h3>
-          <p class="rating">★★★★★ <span>(24)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/CookieRunFanart.png" alt="Cookie Run Fanart" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE</p>
-          <h3>Cookie Run Fanart</h3>
-          <p class="rating">★★★★★ <span>(10)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/MVFullBody2.png" alt="MV Full Body artwork" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE</p>
-          <h3>MV Full Body</h3>
-          <p class="rating">★★★★★ <span>(3)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/DNDAnimeStyleSkeb2.png" alt="DND Anime Style Skeb" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE SKEB</p>
-          <h3>DND Anime Style Skeb</h3>
-          <p class="rating">★★★★★ <span>(25)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/LeagueOfLegendsFanart.png" alt="League of Legends Fanart" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE SKEB</p>
-          <h3>League of Legends Fanart</h3>
-          <p class="rating">★★★★★ <span>(7)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-
-      <article class="product-card">
-        <img src="src/assets/MVHalfBody.png" alt="MV Half Body artwork" />
-        <div class="product-info">
-          <p class="product-label">ANIME STYLE</p>
-          <h3>MV Half Body</h3>
-          <p class="rating">★★★★★ <span>(10)</span></p>
-          <p class="price">$25.00</p>
-          <button class="card-button" type="button">ADD TO BAG</button>
-        </div>
-      </article>
-    </section>
-
-    <nav class="pagination" aria-label="Search result pages">
-      <button type="button">←</button>
-      <button class="active-page" type="button">1</button>
-      <button type="button">2</button>
-      <button type="button">3</button>
-      <button type="button">4</button>
-      <button type="button">5</button>
-      <button type="button">→</button>
-    </nav>
+    <nav
+      class="pagination"
+      aria-label="Search result pages"
+    ></nav>
   </main>
 
    <footer class="footer" id="about">
@@ -647,153 +576,7 @@
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
 
-  <!-- for All Filters button-->
-<div id="filter-overlay" class="filter-overlay"></div>
-
-<aside id="filter-panel" class="filter-panel" aria-hidden="true">
-  <div class="filter-panel-header">
-    <span>Filters</span>
-
-    <button id="reset-filters" class="reset-filters" type="button">
-      Reset
-    </button>
-
-    <button
-      id="close-filters"
-      class="close-filters"
-      type="button"
-      aria-label="Close filters"
-    >
-      ◀
-    </button>
-  </div>
-
-  <details class="filter-group" open>
-    <summary>Category</summary>
-
-    <label>
-      <input type="checkbox" name="category" value="animals" />
-      Animals
-    </label>
-
-    <label>
-      <input type="checkbox" name="category" value="anime-style" />
-      Anime Style
-    </label>
-
-    <label>
-      <input type="checkbox" name="category" value="character-design" />
-      Character Design
-    </label>
-
-    <label>
-      <input type="checkbox" name="category" value="graphic-design" />
-      Graphic Design
-    </label>
-
-    <label>
-      <input type="checkbox" name="category" value="mvs" />
-      MVs
-    </label>
-
-    <label>
-      <input type="checkbox" name="category" value="gifts" />
-      Gifts
-    </label>
-  </details>
-
-  <details class="filter-group">
-    <summary>Item Format</summary>
-
-    <label>
-      <input type="checkbox" name="format" value="prints" />
-      Prints
-    </label>
-
-    <label>
-      <input type="checkbox" name="format" value="acrylics" />
-      Acrylics
-    </label>
-
-    <label>
-      <input type="checkbox" name="format" value="digital" />
-      Digital Artwork
-    </label>
-  </details>
-
-  <details class="filter-group">
-    <summary>Popular</summary>
-
-    <label>
-      <input type="checkbox" name="popular" value="best-sellers" />
-      Best Sellers
-    </label>
-
-    <label>
-      <input type="checkbox" name="popular" value="limited-time" />
-      Limited Time
-    </label>
-
-    <label>
-      <input type="checkbox" name="popular" value="five-stars" />
-      Five-Star Rated
-    </label>
-  </details>
-
-  <details class="filter-group">
-    <summary>Price</summary>
-
-    <label>
-      <input type="radio" name="price" value="under-25" />
-      Under $25
-    </label>
-
-    <label>
-      <input type="radio" name="price" value="under-50" />
-      Under $50
-    </label>
-
-    <label>
-      <input type="radio" name="price" value="50-100" />
-      $50–$100
-    </label>
-
-    <label>
-      <input type="radio" name="price" value="over-100" />
-      Over $100
-    </label>
-  </details>
-
-  <details class="filter-group">
-    <summary>Color</summary>
-
-    <label>
-      <input type="checkbox" name="color" value="pink" />
-      Pink
-    </label>
-
-    <label>
-      <input type="checkbox" name="color" value="purple" />
-      Purple
-    </label>
-
-    <label>
-      <input type="checkbox" name="color" value="blue" />
-      Blue
-    </label>
-
-    <label>
-      <input type="checkbox" name="color" value="green" />
-      Green
-    </label>
-  </details>
-
-  <button id="apply-filters" class="apply-filters" type="button">
-    APPLY FILTERS
-  </button>
-</aside>
-
-  <!--end-->
+  <!-- All Filters panel -->
   <div id="filter-overlay" class="filter-overlay"></div>
 
     <aside
@@ -803,54 +586,71 @@
     >
     
     <button
-        id="close-filters"
-        class="close-filters"
-        type="button"
-        aria-label="Close filters"
+      id="close-filters"
+      class="close-filters"
+      type="button"
+      aria-label="Close filters"
     >
-        ◀
+      ◀
     </button>
 
     <div class="filter-panel-header">
-        <span>Filters</span>
-        <button id="reset-filters" class="reset-filters" type="button">Reset</button>
+      <span>Filters</span>
+      <button id="reset-filters" type="button" class="reset-filters">
+        Reset
+      </button>
     </div>
 
-    <div class="filter-option">
-        <button type="button">
-        Category
-        <span>▼</span>
-        </button>
-    </div>
+    <form id="advanced-filters">
+      <details class="filter-group" open>
+        <summary>Category</summary>
+        <label><input type="checkbox" name="category" value="" checked /> All categories</label>
+        <label><input type="checkbox" name="category" value="Anime Style" /> Anime Style</label>
+        <label><input type="checkbox" name="category" value="Anime Style Skeb" /> Anime Style Skeb</label>
+        <label><input type="checkbox" name="category" value="Character Design" /> Character Design</label>
+        <label><input type="checkbox" name="category" value="Graphic Design" /> Graphic Design</label>
+        <label><input type="checkbox" name="category" value="MVs" /> MVs</label>
+        <label><input type="checkbox" name="category" value="Gifts" /> Gifts</label>
+      </details>
 
-    <div class="filter-option">
-        <button type="button">
-        Item format
-        <span>▼</span>
-        </button>
-    </div>
+      <details class="filter-group">
+        <summary>Item Format</summary>
+        <label><input type="checkbox" name="format" value="" checked /> All formats</label>
+        <label><input type="checkbox" name="format" value="Prints" /> Prints</label>
+        <label><input type="checkbox" name="format" value="Acrylics" /> Acrylics</label>
+        <label><input type="checkbox" name="format" value="Digital" /> Digital Artwork</label>
+      </details>
 
-    <div class="filter-option">
-        <button type="button">
-        Popular
-        <span>▼</span>
-        </button>
-    </div>
+      <details class="filter-group">
+        <summary>Popular</summary>
+        <label><input type="checkbox" name="popular" value="" checked /> All products</label>
+        <label><input type="checkbox" name="popular" value="best-sellers" /> Best Sellers</label>
+        <label><input type="checkbox" name="popular" value="limited-time" /> Limited Time</label>
+        <label><input type="checkbox" name="popular" value="five-stars" /> Five-Star Rated</label>
+      </details>
 
-    <div class="filter-option">
-        <button type="button">
-        Price
-        <span>▼</span>
-        </button>
-    </div>
+      <details class="filter-group">
+        <summary>Price</summary>
+        <label><input type="radio" name="price" value="" checked /> Any price</label>
+        <label><input type="radio" name="price" value="25" /> Under $25</label>
+        <label><input type="radio" name="price" value="50" /> Under $50</label>
+        <label><input type="radio" name="price" value="100" /> Under $100</label>
+      </details>
 
-    <div class="filter-option">
-        <button type="button">
-        Color
-        <span>▼</span>
-        </button>
-    </div>
-    </aside>
+      <details class="filter-group">
+        <summary>Color</summary>
+        <label><input type="checkbox" name="color" value="" checked /> All colors</label>
+        <label><input type="checkbox" name="color" value="Pink" /> Pink</label>
+        <label><input type="checkbox" name="color" value="Purple" /> Purple</label>
+        <label><input type="checkbox" name="color" value="Blue" /> Blue</label>
+        <label><input type="checkbox" name="color" value="Green" /> Green</label>
+      </details>
+
+      <button id="apply-filters" class="apply-filters" type="submit">
+        APPLY FILTERS
+      </button>
+    </form>
+  </aside>
 
     <script>
       const filterButton = document.getElementById("all-filters-button");
@@ -859,6 +659,7 @@
       const closeFilters = document.getElementById("close-filters");
       const resetFilters = document.getElementById("reset-filters");
       const applyFilters = document.getElementById("apply-filters");
+      const advancedFilters = document.getElementById("advanced-filters");
 
       function openFilters() {
         filterPanel.classList.add("open");
@@ -879,14 +680,53 @@
       filterButton.addEventListener("click", openFilters);
       closeFilters.addEventListener("click", closeFilterPanel);
       filterOverlay.addEventListener("click", closeFilterPanel);
-      applyFilters.addEventListener("click", closeFilterPanel);
+
+      advancedFilters.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(advancedFilters);
+        const filters = {};
+
+        const category = formData.get("category");
+        const format = formData.get("format");
+        const popular = formData.get("popular");
+        const price = formData.get("price");
+        const color = formData.get("color");
+
+        if (category) filters.category = category;
+        if (format) filters.format = format;
+        if (color) filters.color = color;
+        if (price) filters.maxPrice = price;
+
+        if (popular === "best-sellers" || popular === "five-stars") {
+          filters.popular = popular;
+        }
+
+        if (popular === "limited-time") {
+          filters.limitedTime = "true";
+        }
+
+        loadProducts(1, filters);
+        closeFilterPanel();
+      });
 
       resetFilters.addEventListener("click", function () {
-        document
-          .querySelectorAll("#filter-panel input")
-          .forEach(function (input) {
-            input.checked = false;
-          });
+        advancedFilters.reset();
+        loadProducts(1, {});
+      });
+
+      advancedFilters.querySelectorAll("input[type='checkbox']").forEach((input) => {
+        input.addEventListener("change", () => {
+          if (!input.checked) return;
+
+          advancedFilters
+            .querySelectorAll(`input[name='${input.name}']`)
+            .forEach((otherInput) => {
+              if (otherInput !== input) {
+                otherInput.checked = false;
+              }
+            });
+        });
       });
 
       document.addEventListener("keydown", function (event) {
@@ -918,5 +758,184 @@
             categoriesButton.setAttribute("aria-expanded", "false");
         });
     </script>
+
+    <script>
+      const API_URL = "http://localhost:3000/api/products";
+
+      const productGrid = document.getElementById("product-grid");
+      const searchInput = document.getElementById("search-input");
+      const sortProducts = document.getElementById("sort-products");
+      const pagination = document.querySelector(".pagination");
+
+      let currentPage = 1;
+      let activeFilters = {};
+
+      async function loadProducts(page = 1, filters = {}) {
+        currentPage = page;
+        activeFilters = filters;
+
+        const params = new URLSearchParams();
+
+        params.set("page", page);
+        params.set("pageSize", "12");
+
+        if (searchInput.value.trim()) {
+          params.set("search", searchInput.value.trim());
+        }
+
+        if (sortProducts.value) {
+          params.set("sort", sortProducts.value);
+        }
+
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== "") {
+            params.set(key, value);
+          }
+        });
+
+        productGrid.innerHTML = "<p>Loading products...</p>";
+
+        try {
+          const response = await fetch(`${API_URL}?${params.toString()}`);
+
+          if (!response.ok) {
+            throw new Error("Could not load products.");
+          }
+
+          const data = await response.json();
+
+          renderProducts(data.products);
+          renderPagination(data.page, data.totalPages);
+        } catch (error) {
+          console.error(error);
+          productGrid.innerHTML =
+            "<p>Unable to load products. Make sure your backend is running.</p>";
+        }
+      }
+
+      function renderProducts(products) {
+        productGrid.innerHTML = "";
+
+        if (products.length === 0) {
+          productGrid.innerHTML = "<p>No products matched your filters.</p>";
+          return;
+        }
+
+        products.forEach((product) => {
+          const card = document.createElement("article");
+
+          card.className = "product-card";
+
+          card.innerHTML = `
+            <img
+              src="${product.image_path}"
+              alt="${product.name}"
+            />
+
+            <div class="product-info">
+              <p class="product-label">
+                ${product.badge || ""}
+              </p>
+
+              <h3>${product.name}</h3>
+
+              <p class="rating">
+                ★★★★★
+                <span>(${product.review_count})</span>
+              </p>
+
+              <p class="price">$${Number(product.price).toFixed(2)}</p>
+
+              <button class="card-button" type="button">
+                ADD TO BAG
+              </button>
+            </div>
+          `;
+
+          productGrid.appendChild(card);
+        });
+      }
+
+      function renderPagination(page, totalPages) {
+        pagination.innerHTML = "";
+
+        const previousButton = document.createElement("button");
+        previousButton.textContent = "←";
+        previousButton.disabled = page === 1;
+
+        previousButton.addEventListener("click", () => {
+          loadProducts(page - 1, activeFilters);
+        });
+
+        pagination.appendChild(previousButton);
+
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+          const pageButton = document.createElement("button");
+
+          pageButton.textContent = pageNumber;
+
+          if (pageNumber === page) {
+            pageButton.classList.add("active-page");
+          }
+
+          pageButton.addEventListener("click", () => {
+            loadProducts(pageNumber, activeFilters);
+          });
+
+          pagination.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "→";
+        nextButton.disabled = page === totalPages;
+
+        nextButton.addEventListener("click", () => {
+          loadProducts(page + 1, activeFilters);
+        });
+
+        pagination.appendChild(nextButton);
+      }
+
+      searchInput.addEventListener("input", () => {
+        loadProducts(1, activeFilters);
+      });
+
+      sortProducts.addEventListener("change", () => {
+        loadProducts(1, activeFilters);
+      });
+
+      document.querySelectorAll(".quick-filter").forEach((button) => {
+        button.addEventListener("click", () => {
+          const filterName = button.dataset.filter;
+          const filterValue = button.dataset.value;
+
+          activeFilters = {
+            [filterName]: filterValue
+          };
+
+          loadProducts(1, activeFilters);
+        });
+      });
+
+      document.querySelectorAll("#categories-dropdown a").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+
+          const url = new URL(link.href);
+          const category = url.searchParams.get("category");
+
+          activeFilters = { category };
+          loadProducts(1, activeFilters);
+        });
+      });
+
+      document.querySelector(".search-box").addEventListener("submit", (event) => {
+        event.preventDefault();
+        loadProducts(1, activeFilters);
+      });
+
+      loadProducts();
+    </script>
 </body>
 </html>
+
