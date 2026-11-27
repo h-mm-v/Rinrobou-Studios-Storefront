@@ -232,7 +232,7 @@ input:focus-visible {
   color: var(--white);
   border: 1px solid var(--mint);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--mint), transparent 85%);
+  background: transparent;
   cursor: pointer;
   font-weight: 700;
   text-align: center;
@@ -242,7 +242,7 @@ input:focus-visible {
 .payment-option:hover {
   color: var(--white);
   border-color: var(--mint);
-  background: color-mix(in srgb, var(--mint), transparent 25%);
+  background: transparent;
 }
 
 .payment-option[aria-pressed="true"] {
@@ -266,6 +266,7 @@ input:focus-visible {
 
 .order-column {
   align-self: start;
+  min-width: 0;
 }
 
 .order-summary {
@@ -314,6 +315,7 @@ input:focus-visible {
 .order-table th:first-child,
 .order-table td:first-child {
   padding-left: 0;
+  overflow-wrap: anywhere;
 }
 
 .order-totals {
@@ -439,6 +441,20 @@ input:focus-visible {
 
   .terms-link-image {
     max-width: 140px;
+  }
+
+  .totals-with-terms {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .terms-link,
+  .totals-with-terms .order-totals {
+    flex-basis: auto;
+  }
+
+  .totals-with-terms .order-totals {
+    max-width: none;
   }
 
   .grand-total {

@@ -40,9 +40,10 @@ export async function initializeCommissionStorage(): Promise<void> {
         email VARCHAR(254) NOT NULL,
         phone VARCHAR(40) NULL,
         description TEXT NOT NULL,
-        attachments TEXT NOT NULL,
+        attachments JSON NOT NULL,
         physical BOOLEAN NOT NULL DEFAULT FALSE,
         deadline DATE NULL,
+        status ENUM('pending', 'accepted', 'declined', 'completed') NOT NULL DEFAULT 'pending',
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
@@ -148,7 +149,7 @@ router.post('/api/commissions', upload.array('references', 5), async (request, r
     response.status(400).json({ message: 'Phone number must be 40 characters or fewer.' });
     return;
   }
-  if (!isValidDeadline(deadline)) {
+  if (deadline && !isValidDeadline(deadline)) {
     await removeUploadedFiles();
     response.status(400).json({ message: 'Enter a valid preferred deadline.' });
     return;

@@ -13,10 +13,18 @@ app.use(commissionRouter);
 app.use(checkoutRouter);
 
 app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
-app.get(['/commission', '/commission/', '/commission.html'], (_request, response) =>
-  response.sendFile(path.join(projectRoot, 'commission', 'index.html')));
-app.get(['/checkout', '/checkout/', '/checkout.html'], (_request, response) =>
-  response.sendFile(path.join(projectRoot, 'checkout', 'index.html')));
+app.get(['/commission', '/commission/', '/commission.html', '/commission/commission.html', '/commission/index.html'], (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'commission', 'commission.html')));
+app.get(['/checkout', '/checkout/', '/checkout.html', '/checkout/checkout.html', '/checkout/index.html'], (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'checkout', 'checkout.html')));
+for (const publicFile of [
+  'homepage.html', 'homepage~stylesheet.css', 'portfolio.html', 'login.html', 'login.css',
+  'SearchResultsPage.html', 'terms-of-service.html', 'terms-of-service.css',
+]) {
+  app.get(`/${publicFile}`, (_request, response) => response.sendFile(path.join(projectRoot, publicFile)));
+}
+app.get('/AboutUsPage.html', (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'src', 'pages', 'AboutUsPage.html')));
 app.get('/catalog.html', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
 app.get('/Pages/ShoppingCart.html', (_request, response) =>
   response.sendFile(path.join(projectRoot, 'Pages', 'ShoppingCart.html')));

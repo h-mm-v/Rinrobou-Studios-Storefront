@@ -88,7 +88,7 @@
     }
 
     .field-control:focus-visible,
-    .file-input:focus-visible + .file-control .file-button,
+    .file-input:focus-visible ~ .file-control .file-button,
     .submit-button:focus-visible {
       border-color: var(--mint);
       box-shadow: 0 0 0 3px rgb(154 242 214 / 22%);
@@ -165,19 +165,19 @@
     }
 
     .check-list-and-terms {
-      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(120px, 200px);
+      align-items: center;
+      gap: 24px;
     }
 
     .check-list {
-      width: calc(100% - 224px);
+      min-width: 0;
     }
 
     .commission-terms-link {
       display: block;
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: min(200px, 28vw);
+      width: 100%;
     }
 
     .commission-terms-link img {
@@ -265,7 +265,7 @@
 
     .submit-button:hover {
       color: var(--white);
-      background: color-mix(in srgb, linear-gradient(110deg, rgb(253 149 224 / 20%), rgb(154 242 214 / 18%), transparent 85%));
+      background: linear-gradient(110deg, rgb(253 149 224 / 30%), rgb(154 242 214 / 28%));
       border-color: var(--mint);
     }
 
@@ -276,6 +276,11 @@
       font-weight: 600;
     }
 
+    .submit-button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
     @media (max-width: 460px) {
       main {
         padding-inline: 16px;
@@ -283,7 +288,7 @@
 
       .check-list-and-terms {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(90px, 130px);
+        grid-template-columns: minmax(0, 1fr);
         align-items: center;
         gap: 12px;
       }
@@ -295,6 +300,7 @@
       .commission-terms-link {
         position: static;
         width: 100%;
+        max-width: 140px;
         transform: none;
       }
 

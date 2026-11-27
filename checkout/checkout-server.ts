@@ -61,10 +61,10 @@ interface CheckoutRequestBody {
 }
 
 const products: Product[] = [
-  { id: 'donut-float-chibi', name: 'Donut Float Chibi', priceCents: 2500 },
-  { id: 'butler-mage-polaroid', name: 'Butler & Mage Polaroid', priceCents: 5500 },
-  { id: 'halloween-costume-chibi', name: 'Halloween Costume Chibi', priceCents: 2500 },
-  { id: 'pokemon-onesies-chibi', name: 'Pokemon Onesies Chibi', priceCents: 2500 },
+  { id: 'donut-float-chibi', name: 'Donut Float Chibi', priceCents: 2000 },
+  { id: 'butler-mage-polaroid', name: 'Butler & Mage Polaroid', priceCents: 2000 },
+  { id: 'halloween-costume-chibi', name: 'Halloween Costume Chibi', priceCents: 2000 },
+  { id: 'pokemon-onesies-chibi', name: 'Pokemon Onesies Chibi', priceCents: 2000 },
 ];
 const productById = new Map(products.map((product) => [product.id, product]));
 const router = Router();
@@ -311,17 +311,27 @@ async function setProviderOrder(orderId: string, providerId: string): Promise<vo
 }
 
 async function setPaymentStatus(
-  providerId: string,
-  method: PaymentMethod,
+  session: Stripe.Checkout.Session,
   status: 'paid' | 'failed',
-): Promise<void> {
+): Promise<boolean> {
+  const orderId = session.metadata?.orderId;
+  if (!orderId || session.mode !== 'payment') return false;
   const connection = await createDatabaseConnection();
   try {
+    const [orders] = await connection.execute<RowDataPacket[]>(
+      `SELECT amount_cents, currency FROM orders
+       WHERE id = ? AND payment_method = 'stripe' AND provider_order_id = ?`,
+      [orderId, session.id],
+    );
+    const order = orders[0];
+    if (!order || Number(order.amount_cents) !== session.amount_total ||
+        String(order.currency).toLowerCase() !== session.currency) return false;
     await connection.execute(
       `UPDATE orders SET payment_status = ?
-       WHERE payment_method = ? AND provider_order_id = ? AND payment_status = 'pending'`,
-      [status, method, providerId],
+       WHERE id = ? AND provider_order_id = ? AND payment_status <> 'paid'`,
+      [status, orderId, session.id],
     );
+    return true;
   } finally {
     await connection.end();
   }
@@ -337,7 +347,9 @@ router.get('/api/checkout/products', (_request, response) => {
 });
 
 router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Request, response: Response) => {
-  const body = request.body as CheckoutRequestBody;
+  const body = request.body && typeof request.body === 'object'
+    ? request.body as CheckoutRequestBody
+    : {};
   const shippingValidation = validateShipping(body);
   const items = validateItems(body.items);
   const method = body['payment-method'];
@@ -365,6 +377,7 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
 
     const order = await createOrder(shipping, items, method);
     let redirectUrl: string;
+    let sessionId: string;
     try {
       if (method === 'stripe') {
         const stripe = getStripe();
@@ -404,10 +417,11 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
           cancel_url: `${getPublicBaseUrl()}/checkout/?payment=cancelled`,
           metadata: { orderId: order.id },
           payment_intent_data: { metadata: { orderId: order.id } },
-        });
+        }, { idempotencyKey: `checkout-${order.publicId}` });
         if (!session.url) throw new Error('Stripe did not return a checkout URL.');
         await setProviderOrder(order.id, session.id);
         redirectUrl = session.url;
+        sessionId = session.id;
       } else {
         throw new Error('Unsupported payment method.');
       }
@@ -426,7 +440,7 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
       return;
     }
 
-    response.status(201).json({ redirectUrl });
+    response.status(201).json({ redirectUrl, sessionId });
   } catch (error) {
     console.error('Failed to create checkout:', error);
     response.status(500).json({ message: 'Checkout could not be started. Please try again later.' });
@@ -434,6 +448,7 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
 });
 
 router.get('/api/checkout/payment-status', async (request, response) => {
+  response.setHeader('Cache-Control', 'no-store');
   const sessionId = typeof request.query.session_id === 'string' ? request.query.session_id : '';
   if (!sessionId || sessionId.length > 255) {
     response.status(400).json({ message: 'Invalid payment session.' });
@@ -448,8 +463,16 @@ router.get('/api/checkout/payment-status', async (request, response) => {
       return;
     }
     if (session.payment_status === 'paid') {
-      await setPaymentStatus(session.id, 'stripe', 'paid');
+      if (!await setPaymentStatus(session, 'paid')) {
+        response.status(409).json({ message: 'Payment does not match a stored order. Please contact us.' });
+        return;
+      }
       response.json({ status: 'paid' });
+      return;
+    }
+    if (session.status === 'expired') {
+      await setPaymentStatus(session, 'failed');
+      response.json({ status: 'failed' });
       return;
     }
     response.json({ status: 'pending' });
@@ -479,11 +502,15 @@ router.post('/api/webhooks/stripe', express.raw({ type: 'application/json', limi
     if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.payment_status === 'paid') {
-        await setPaymentStatus(session.id, 'stripe', 'paid');
+        if (!await setPaymentStatus(session, 'paid')) {
+          // Retry if the event arrived before the session was linked to its order.
+          response.sendStatus(500);
+          return;
+        }
       }
     } else if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      await setPaymentStatus(session.id, 'stripe', 'failed');
+      await setPaymentStatus(session, 'failed');
     }
     response.sendStatus(200);
   } catch (error) {

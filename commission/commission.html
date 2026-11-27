@@ -86,13 +86,13 @@
         </div>
 
         <div>
-          <input class="file-input" id="reference-files" name="references" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif,image/bmp,.pdf" multiple aria-labelledby="reference-label">
+          <input class="file-input" id="reference-files" name="references" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif,image/bmp,.pdf" multiple aria-labelledby="reference-label" aria-describedby="file-help">
           <span class="sr-only" id="reference-label">Attach references and files</span>
           <label class="file-control" for="reference-files">
             <span class="file-button" aria-hidden="true">✧ &nbsp; Attach References and Files</span>
             <span class="sr-only">Choose reference files</span>
           </label>
-          <p class="file-help">Images and PDF files are welcome.</p>
+          <p class="file-help" id="file-help" aria-live="polite">Up to 5 images or PDFs, 5 MB per file.</p>
         </div>
 
         <label class="check-row" for="physical-commission">
@@ -101,8 +101,8 @@
         </label>
 
         <div>
-          <label class="field-label" for="preferred-deadline">Preferred Deadline <span class="required-mark" aria-hidden="true">✦</span></label>
-          <input class="field-control" id="preferred-deadline" name="deadline" type="date" required>
+          <label class="field-label" for="preferred-deadline">Preferred Deadline <span class="optional-mark">(Optional)</span></label>
+          <input class="field-control" id="preferred-deadline" name="deadline" type="date">
         </div>
 
         <div>
