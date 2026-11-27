@@ -5,91 +5,124 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#20082B">
   <title>Checkout | Rinrobou Studio</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="checkout.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/checkout/checkout.css">
 </head>
 <body>
   <header class="navbar">
-      <nav class="nav-links">
-        <a href="homepage.html">Home</a>
-        <a href="catalog.html">Catalog</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="src/pages/AboutUsPage.tsx">About Us</a>
-      </nav>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/homepage.html">Home</a>
+      <a href="/catalog.html">Catalog</a>
+      <a href="/portfolio.html">Portfolio</a>
+      <a href="/AboutUsPage.html">About Us</a>
+    </nav>
 
-      <a href="index.html" class="nav-logo">
-        <img src="src/assets/logo-small.png" alt="RinRobou Studios" />
-      </a>
+    <a href="/homepage.html" class="nav-logo">
+      <img src="/src/assets/logo-small.png" alt="RinRobou Studios" />
+    </a>
 
-      <div class="nav-icons">
-        <button class="icon-button" aria-label="Account">
+    <div class="nav-icons">
+      <a href="/login.html" class="icon-button" aria-label="Account">
           <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            stroke-width="1"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
           >
-              <circle cx="12" cy="8" r="3.5"></circle>
-              <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
           </svg>
-        </button>
-        <button aria-label="Search">⌕</button>
-        <button aria-label="Shopping cart">🛒</button>
-      </div>
+        </a>
+      <a href="/SearchResultsPage.html" class="icon-button" aria-label="Search">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </a>
+      <a href="/Pages/ShoppingCart.html" class="icon-button" aria-label="Shopping cart">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="8" cy="21" r="1"></circle>
+            <circle cx="19" cy="21" r="1"></circle>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+          </svg>
+        </a>
+    </div>
   </header>
   <main>
+    <h1 class="page-heading">Checkout</h1>
+    <p><a class="back-to-cart" href="/Pages/ShoppingCart.html">Back to cart</a></p>
     <form id="checkout-form" class="checkout-panel">
+      <noscript><p>Enable JavaScript to review your order and continue to secure checkout.</p></noscript>
       <div class="customer-details">
         <section class="form-section" aria-labelledby="contact-heading">
           <h2 class="section-title" id="contact-heading">Contact Information ✦</h2>
           <div class="field-stack">
             <label>
               <span class="sr-only">Email address</span>
-              <input type="email" name="email" placeholder="your@email.com" autocomplete="email" required>
+              <input type="email" name="email" placeholder="your@email.com" autocomplete="email" maxlength="254" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" required>
             </label>
             <label>
               <span class="sr-only">Phone number (optional)</span>
-              <input type="tel" name="phone" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel">
-            </label>
-            <label class="check-row">
-              <input type="checkbox" name="phone-updates">
-              <span>I would like to receive updates to this phone number</span>
+              <input type="tel" name="phone" placeholder="+1 (***)-***-**** (Optional)" autocomplete="tel" maxlength="40">
             </label>
           </div>
         </section>
 
         <section class="form-section" aria-labelledby="billing-heading">
-          <h2 class="section-title" id="billing-heading">Shipping and Billing Information ✦</h2>
+          <h2 class="section-title" id="billing-heading">Shipping Information ✦</h2>
           <div class="field-stack">
             <div class="field-row">
               <label>
                 <span class="sr-only">First name</span>
-                <input type="text" name="first-name" placeholder="First Name" autocomplete="given-name" required>
+                <input type="text" name="first-name" placeholder="First Name" autocomplete="given-name" maxlength="100" required>
               </label>
               <label>
                 <span class="sr-only">Last name</span>
-                <input type="text" name="last-name" placeholder="Last Name" autocomplete="family-name" required>
+                <input type="text" name="last-name" placeholder="Last Name" autocomplete="family-name" maxlength="100" required>
               </label>
             </div>
             <label>
               <span class="sr-only">Street address</span>
-              <input type="text" name="address" placeholder="Street Address" autocomplete="street-address" required>
+              <input type="text" name="address" placeholder="Street Address" autocomplete="address-line1" maxlength="255" required>
             </label>
             <label>
               <span class="sr-only">Apartment, suite, or unit (optional)</span>
-              <input type="text" name="address-extra" placeholder="Apartment, Suite, Unit, etc. (Optional)" autocomplete="address-line2">
+              <input type="text" name="address-extra" placeholder="Apartment, Suite, Unit, etc. (Optional)" autocomplete="address-line2" maxlength="255">
             </label>
             <div class="field-row address-location">
               <label>
                 <span class="sr-only">City</span>
-                <input type="text" name="city" placeholder="City" autocomplete="address-level2" required>
+                <input type="text" name="city" placeholder="City" autocomplete="address-level2" maxlength="100" required>
               </label>
               <label>
                 <span class="sr-only">State</span>
-                <input type="text" name="state" placeholder="State (i.e. CA)" autocomplete="address-level1" required>
+                <input type="text" name="state" placeholder="State (i.e. CA)" autocomplete="address-level1" maxlength="100" required>
               </label>
               <label>
                 <span class="sr-only">ZIP code</span>
-                <input type="text" name="postal-code" placeholder="ZIP Code" autocomplete="postal-code" required>
+                <input type="text" name="postal-code" placeholder="ZIP Code" autocomplete="postal-code" maxlength="20" required>
               </label>
             </div>
             <label>
@@ -102,8 +135,6 @@
         <section class="form-section" aria-labelledby="payment-heading">
           <h2 class="section-title" id="payment-heading">Payment Method ✦</h2>
           <div class="payment-options" role="group" aria-label="Available payment methods">
-            <button class="payment-option" type="button" data-payment-method="paypal" aria-pressed="false">PayPal</button>
-            <button class="payment-option" type="button" data-payment-method="venmo" aria-pressed="false">Venmo</button>
             <button class="payment-option" type="button" data-payment-method="stripe" aria-pressed="false">Stripe</button>
           </div>
           <input type="hidden" name="payment-method" value="">
@@ -127,8 +158,8 @@
         </section>
         <div class="checkout-totals">
           <div class="totals-with-terms">
-            <a class="terms-link" href="terms-of-service.html" target="_blank" rel="noopener noreferrer" aria-label="Read the Terms of Service">
-              <img class="terms-link-image" src="src/assets/ToS-link.png" alt="">
+            <a class="terms-link" href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" aria-label="Read the Terms of Service">
+              <img class="terms-link-image" src="/src/assets/ToS-link.png" alt="">
             </a>
             <div class="order-totals">
               <div class="total-line"><span>Subtotal:</span><span id="subtotal-value">$0.00</span></div>
@@ -141,7 +172,7 @@
             <input id="terms-accepted" type="checkbox" name="terms-accepted" aria-label="I accept Rinrobou Studio's Terms of Service" required>
             <label for="terms-accepted">I accept Rinrobou Studio's Terms of Service.</label>
           </div>
-          <button class="checkout-submit" type="submit">Complete Payment</button>
+          <button class="checkout-submit" type="submit" disabled>Continue to Secure Payment</button>
           <p id="checkout-status" class="checkout-status" role="status" aria-live="polite"></p>
         </div>
       </div>
@@ -150,7 +181,7 @@
 
   <footer class="footer" id="about">
     <div>
-      <img src="src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
+      <img src="/src/assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
 
       <div class="footer-columns">
         <div>
@@ -167,10 +198,10 @@
       </div>
     </div>
 
-    <img src="src/assets/footer-art.png" alt="Character artwork" class="footer-art" />
+    <img src="/src/assets/footer-art.png" alt="Character artwork" class="footer-art" />
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
-  <script type="module" src="/checkout-client.js"></script>
+  <script type="module" src="/checkout/checkout-client.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@ interface ProductCatalog {
 interface CartItem {
   id: string;
   quantity: number;
+  selected?: boolean;
 }
 
 interface CheckoutProduct extends Product {
@@ -26,10 +27,12 @@ interface PaymentStatusResponse {
 
 interface CheckoutResponse {
   redirectUrl?: string;
+  sessionId?: string;
   message?: string;
 }
 
 const cartKey = 'rinrobou-cart';
+const pendingCheckoutKey = 'rinrobou-pending-checkout-items';
 
 const form = document.querySelector<HTMLFormElement>('#checkout-form');
 const statusMessage = document.querySelector<HTMLElement>('#checkout-status');
@@ -39,11 +42,13 @@ const taxValue = document.querySelector<HTMLElement>('#tax-value');
 const shippingValue = document.querySelector<HTMLElement>('#shipping-value');
 const totalValue = document.querySelector<HTMLElement>('#grand-total-value');
 const paymentMethodInput = form?.querySelector<HTMLInputElement>('input[name="payment-method"]');
-const paymentButtons = [...(form?.querySelectorAll<HTMLButtonElement>('[data-payment-method]') ?? [])];
+const stripeButton = document.querySelector<HTMLButtonElement>('[data-payment-method="stripe"]');
 const submitButton = form?.querySelector<HTMLButtonElement>('.checkout-submit');
 let checkoutProducts: CheckoutProduct[] = [];
+let loadedCart = '';
 let productsLoaded = false;
 let isVerifyingPayment = false;
+let isSubmitting = false;
 
 function displayAmount(cents: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
@@ -54,11 +59,13 @@ function getCart(): CartItem[] {
   try {
     stored = JSON.parse(localStorage.getItem(cartKey) ?? '[]');
   } catch {
-    return [];
+    throw new Error('Your saved cart could not be read. Return to your cart and try again.');
   }
-  if (!Array.isArray(stored)) return [];
+  if (!Array.isArray(stored)) {
+    throw new Error('Your saved cart is invalid. Return to your cart and try again.');
+  }
 
-  const quantities = new Map<string, number>();
+  const items = new Map<string, CartItem>();
   for (const entry of stored) {
     if (typeof entry !== 'object' || entry === null) continue;
     const item = entry as Record<string, unknown>;
@@ -72,9 +79,14 @@ function getCart(): CartItem[] {
       continue;
     }
 
-    quantities.set(item.id, Math.min(10, (quantities.get(item.id) ?? 0) + Number(item.quantity)));
+    const existing = items.get(item.id);
+    items.set(item.id, {
+      id: item.id,
+      quantity: Math.min(10, (existing?.quantity ?? 0) + Number(item.quantity)),
+      selected: existing?.selected === true || item.selected !== false,
+    });
   }
-  return Array.from(quantities, ([id, quantity]) => ({ id, quantity }));
+  return [...items.values()].filter((item) => item.selected);
 }
 
 function setStatus(message: string): void {
@@ -83,13 +95,17 @@ function setStatus(message: string): void {
 
 function updateSubmitButton(): void {
   if (submitButton) {
-    submitButton.disabled = !productsLoaded || checkoutProducts.length === 0 || isVerifyingPayment;
+    submitButton.disabled = !productsLoaded || checkoutProducts.length === 0 ||
+      paymentMethodInput?.value !== 'stripe' || isVerifyingPayment || isSubmitting;
   }
 }
 
 async function readJson<T>(response: Response): Promise<T> {
   try {
     const value: unknown = await response.json();
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+      throw new Error('Invalid response.');
+    }
     return value as T;
   } catch {
     throw new Error('The server returned an invalid response. Please try again later.');
@@ -140,25 +156,21 @@ function showPaymentResult(): void {
     return;
   }
   if (payment === 'error') {
+    isVerifyingPayment = true;
+    updateSubmitButton();
     setStatus('We could not verify that payment. Please contact us before trying again.');
     return;
   }
   if (payment === 'success') {
     const sessionId = params.get('session_id');
     if (!sessionId) {
+      isVerifyingPayment = true;
+      updateSubmitButton();
       setStatus('We could not verify the payment session. Please contact us before trying again.');
       return;
     }
     void verifyPaymentStatus(`/api/checkout/payment-status?session_id=${encodeURIComponent(sessionId)}`);
     return;
-  }
-  if (payment === 'paid' || payment === 'pending') {
-    const orderId = params.get('order_id');
-    if (!orderId) {
-      setStatus('We could not verify the order. Please contact us before trying again.');
-      return;
-    }
-    void verifyPaymentStatus(`/api/checkout/payment-status?order_id=${encodeURIComponent(orderId)}`);
   }
 }
 
@@ -171,14 +183,51 @@ async function verifyPaymentStatus(url: string): Promise<void> {
     const response = await fetch(url);
     const result = await readJson<PaymentStatusResponse>(response);
     if (!response.ok || !isPaymentStatusResponse(result)) {
-      if (response.status < 500) isVerifyingPayment = false;
       throw new Error(result.message ?? 'Payment status could not be checked.');
     }
 
     if (result.status === 'paid') {
-      localStorage.removeItem(cartKey);
+      try {
+        const sessionId = new URL(url, window.location.href).searchParams.get('session_id');
+        const completedKey = `rinrobou-completed-payment:${sessionId}`;
+        const pending = sessionStorage.getItem(pendingCheckoutKey);
+        const pendingCheckout = pending ? JSON.parse(pending) : null;
+        const matchesPending = pendingCheckout?.sessionId === sessionId &&
+          !sessionStorage.getItem(completedKey);
+        const pendingItems: unknown = matchesPending ? pendingCheckout.items : [];
+        const quantities = new Map<string, number>();
+        if (Array.isArray(pendingItems)) {
+          for (const item of pendingItems) {
+            if (typeof item === 'object' && item !== null) {
+              const candidate = item as Record<string, unknown>;
+              if (typeof candidate.id === 'string' && Number.isInteger(candidate.quantity) && Number(candidate.quantity) > 0) {
+                quantities.set(candidate.id, Number(candidate.quantity));
+              }
+            }
+          }
+        }
+        if (matchesPending && Array.isArray(pendingItems)) {
+          const currentCart = JSON.parse(localStorage.getItem(cartKey) ?? '[]') as unknown;
+          if (!Array.isArray(currentCart)) throw new Error('Invalid saved cart.');
+          const remaining = currentCart.flatMap((item) => {
+            if (typeof item !== 'object' || item === null) return [];
+            const candidate = item as Record<string, unknown>;
+            if (typeof candidate.id !== 'string' || !Number.isInteger(candidate.quantity)) return [];
+            const quantity = Number(candidate.quantity) - (quantities.get(candidate.id) ?? 0);
+            quantities.delete(candidate.id);
+            return quantity > 0 ? [{ ...candidate, quantity }] : [];
+          });
+          if (remaining.length > 0) localStorage.setItem(cartKey, JSON.stringify(remaining));
+          else localStorage.removeItem(cartKey);
+          sessionStorage.setItem(completedKey, 'true');
+          sessionStorage.removeItem(pendingCheckoutKey);
+        }
+      } catch {
+        setStatus('Payment completed, but your cart could not be updated. Please review it before ordering again.');
+        updateSubmitButton();
+        return;
+      }
       checkoutProducts = [];
-      isVerifyingPayment = false;
       setStatus('Payment complete. Thank you for your order!');
     } else if (result.status === 'failed' || result.status === 'cancelled') {
       isVerifyingPayment = false;
@@ -204,7 +253,9 @@ async function loadProducts(): Promise<void> {
     throw new Error('Products could not be loaded. Please try again later.');
   }
 
-  checkoutProducts = getCart().flatMap((item) => {
+  const cart = getCart();
+  loadedCart = JSON.stringify(cart);
+  checkoutProducts = cart.flatMap((item) => {
     const product = catalog.products.find((candidate) => candidate.id === item.id);
     return product ? [{ ...product, quantity: item.quantity }] : [];
   });
@@ -230,8 +281,9 @@ async function loadProducts(): Promise<void> {
   subtotalValue.textContent = displayAmount(subtotalCents);
   const taxCents = Math.round(subtotalCents * catalog.taxRatePercent / 100);
   taxValue.textContent = displayAmount(taxCents);
-  shippingValue.textContent = displayAmount(catalog.shippingCents);
-  totalValue.textContent = displayAmount(subtotalCents + taxCents + catalog.shippingCents);
+  const shippingCents = checkoutProducts.length > 0 ? catalog.shippingCents : 0;
+  shippingValue.textContent = displayAmount(shippingCents);
+  totalValue.textContent = displayAmount(subtotalCents + taxCents + shippingCents);
   productsLoaded = true;
   updateSubmitButton();
 
@@ -241,41 +293,40 @@ async function loadProducts(): Promise<void> {
   }
 }
 
-for (const button of paymentButtons) {
-  button.addEventListener('click', () => {
-    if (!paymentMethodInput) return;
-    const selectedMethod = button.dataset.paymentMethod;
-    if (!selectedMethod || !['paypal', 'venmo', 'stripe'].includes(selectedMethod)) return;
-
-    paymentMethodInput.value = selectedMethod;
-    for (const candidate of paymentButtons) {
-      candidate.setAttribute('aria-pressed', String(candidate === button));
-    }
-    const methodName = button.textContent?.trim() ?? selectedMethod;
-    setStatus(`${methodName} selected. Complete payment to continue.`);
-  });
-}
+stripeButton?.addEventListener('click', () => {
+  if (!paymentMethodInput || isVerifyingPayment || isSubmitting) return;
+  const selected = paymentMethodInput.value !== 'stripe';
+  paymentMethodInput.value = selected ? 'stripe' : '';
+  stripeButton.setAttribute('aria-pressed', String(selected));
+  updateSubmitButton();
+});
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!form || !paymentMethodInput) return;
+  if (isVerifyingPayment || isSubmitting) return;
   if (!productsLoaded || checkoutProducts.length === 0) {
     setStatus('Your bag is empty or still loading. Add items from the catalog and try again.');
     return;
   }
-  if (!paymentMethodInput.value) {
-    setStatus('Choose PayPal, Venmo, or Stripe to continue.');
+  if (paymentMethodInput.value !== 'stripe') {
+    setStatus('Please select Stripe as your payment method.');
     return;
   }
+  if (!form.reportValidity()) return;
 
-  if (submitButton) submitButton.disabled = true;
-  const selectedButton = paymentButtons.find(
-    (button) => button.dataset.paymentMethod === paymentMethodInput.value,
-  );
-  const methodName = selectedButton?.textContent?.trim() ?? 'secure payment';
-  setStatus(`Starting ${methodName} checkout...`);
+  isSubmitting = true;
+  updateSubmitButton();
+  setStatus('Starting secure checkout...');
 
   try {
+    if (JSON.stringify(getCart()) !== loadedCart) {
+      await loadProducts();
+      throw new Error('Your cart changed. Review your updated order before continuing.');
+    }
+    // Check storage before creating a payment session so its items can be tracked on return.
+    const pendingCheckout = sessionStorage.getItem(pendingCheckoutKey);
+    sessionStorage.setItem(pendingCheckoutKey, pendingCheckout ?? 'null');
     const termsElement = form.querySelector<HTMLInputElement>('[name="terms-accepted"]');
     const data = new FormData(form);
     const payload = Object.fromEntries(data.entries());
@@ -289,24 +340,48 @@ form?.addEventListener('submit', async (event) => {
       }),
     });
     const result = await readJson<CheckoutResponse>(response);
-    if (!response.ok || typeof result.redirectUrl !== 'string') {
+    if (!response.ok || typeof result.redirectUrl !== 'string' || typeof result.sessionId !== 'string') {
       throw new Error(result.message ?? 'Checkout could not be started.');
     }
 
     const redirectUrl = new URL(result.redirectUrl, window.location.href);
-    if (redirectUrl.protocol !== 'https:' && redirectUrl.protocol !== 'http:') {
+    if (redirectUrl.protocol !== 'https:' || redirectUrl.hostname !== 'checkout.stripe.com') {
       throw new Error('The payment provider returned an invalid checkout URL.');
     }
+    sessionStorage.setItem(pendingCheckoutKey, JSON.stringify({
+      sessionId: result.sessionId,
+      items: checkoutProducts.map(({ id, quantity }) => ({ id, quantity })),
+    }));
     window.location.assign(redirectUrl.href);
   } catch (error) {
+    isSubmitting = false;
     setStatus(error instanceof Error ? error.message : 'Checkout could not be started.');
     updateSubmitButton();
   }
 });
 
-showPaymentResult();
+updateSubmitButton();
+window.addEventListener('storage', (event) => {
+  if ((event.key === cartKey || event.key === null) && !isVerifyingPayment && !isSubmitting) {
+    productsLoaded = false;
+    updateSubmitButton();
+    void loadProducts().then(() => setStatus('Your cart changed. Review your updated order.')).catch((error: unknown) => {
+      setStatus(error instanceof Error ? error.message : 'Your cart could not be loaded.');
+    });
+  }
+});
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    isSubmitting = false;
+    productsLoaded = false;
+    updateSubmitButton();
+    void loadProducts().catch((error: unknown) => {
+      setStatus(error instanceof Error ? error.message : 'Your cart could not be loaded.');
+    }).finally(showPaymentResult);
+  }
+});
 void loadProducts().catch((error: unknown) => {
   productsLoaded = false;
   updateSubmitButton();
   setStatus(error instanceof Error ? error.message : 'Products could not be loaded.');
-});
+}).finally(showPaymentResult);

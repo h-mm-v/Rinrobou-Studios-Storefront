@@ -58,6 +58,10 @@ main {
   text-align: center;
 }
 
+.back-to-cart {
+  color: var(--pink);
+}
+
 .checkout-panel {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
@@ -122,18 +126,64 @@ input:focus-visible {
 
 .check-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 9px;
   color: var(--mint);
   font-size: 0.9rem;
   line-height: 1.45;
 }
 
-.check-row input {
-  width: 17px;
-  height: 17px;
-  margin: 1px 0 0;
-  accent-color: var(--pink);
+.check-row input[type="checkbox"] {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  margin: 0;
+  border: 2px solid #91e6d5;
+  border-radius: 7px;
+  background: rgb(23 15 54 / 90%);
+  box-shadow: 0 0 0 2px rgb(145 230 213 / 12%);
+  cursor: pointer;
+}
+
+.check-row input[type="checkbox"]:checked {
+  border-color: #fa82c9;
+  background: #fa82c9;
+}
+
+.check-row input[type="checkbox"]:checked::after {
+  display: block;
+  width: 8px;
+  height: 14px;
+  margin: 3px 0 0 9px;
+  border: solid #170f36;
+  border-width: 0 3px 3px 0;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.check-row input[type="checkbox"]:indeterminate {
+  border-color: #fa82c9;
+  background: #fa82c9;
+}
+
+.check-row input[type="checkbox"]:indeterminate::after {
+  display: block;
+  width: 14px;
+  height: 3px;
+  margin: 12px auto;
+  border-radius: 2px;
+  background: #170f36;
+  content: "";
+}
+
+.check-row input[type="checkbox"]:hover {
+  border-color: #fa82c9;
+}
+
+.check-row input[type="checkbox"]:focus-visible {
+  outline: 3px solid rgb(145 230 213 / 45%);
+  outline-offset: 3px;
 }
 
 .terms-acceptance {
@@ -145,12 +195,6 @@ input:focus-visible {
 
 .terms-acceptance label {
   cursor: pointer;
-}
-
-.terms-acceptance input {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  accent-color: var(--mint);
 }
 
 .totals-with-terms {
@@ -192,7 +236,7 @@ input:focus-visible {
   color: var(--white);
   border: 1px solid var(--mint);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--mint), transparent 85%);
+  background: transparent;
   cursor: pointer;
   font-weight: 700;
   text-align: center;
@@ -202,7 +246,7 @@ input:focus-visible {
 .payment-option:hover {
   color: var(--white);
   border-color: var(--mint);
-  background: color-mix(in srgb, var(--mint), transparent 25%);
+  background: transparent;
 }
 
 .payment-option[aria-pressed="true"] {
@@ -226,6 +270,7 @@ input:focus-visible {
 
 .order-column {
   align-self: start;
+  min-width: 0;
 }
 
 .order-summary {
@@ -274,6 +319,7 @@ input:focus-visible {
 .order-table th:first-child,
 .order-table td:first-child {
   padding-left: 0;
+  overflow-wrap: anywhere;
 }
 
 .order-totals {
@@ -399,6 +445,20 @@ input:focus-visible {
 
   .terms-link-image {
     max-width: 140px;
+  }
+
+  .totals-with-terms {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .terms-link,
+  .totals-with-terms .order-totals {
+    flex-basis: auto;
+  }
+
+  .totals-with-terms .order-totals {
+    max-width: none;
   }
 
   .grand-total {
