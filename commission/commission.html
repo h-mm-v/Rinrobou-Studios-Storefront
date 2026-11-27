@@ -10,7 +10,7 @@
 </head>
 <body>
   <header class="navbar">
-    <nav class="nav-links">
+    <nav class="nav-links" aria-label="Main navigation">
       <a href="/homepage.html">Home</a>
       <a href="/catalog.html">Catalog</a>
       <a href="/portfolio.html">Portfolio</a>
@@ -22,8 +22,7 @@
     </a>
 
     <div class="nav-icons">
-      <a href="/login.html">
-        <button class="icon-button" aria-label="Account">
+      <a href="/login.html" class="icon-button" aria-label="Account">
           <svg
             width="16"
             height="16"
@@ -35,10 +34,8 @@
             <circle cx="12" cy="8" r="3.5"></circle>
             <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
           </svg>
-        </button>
       </a>
-      <a href="/SearchResultsPage.html">
-        <button aria-label="Search">
+      <a href="/SearchResultsPage.html" class="icon-button" aria-label="Search">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -53,10 +50,8 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-        </button>
       </a>
-      <a href="/Pages/ShoppingCart.html">
-        <button aria-label="Shopping cart">
+      <a href="/Pages/ShoppingCart.html" class="icon-button" aria-label="Shopping cart">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -72,14 +67,15 @@
             <circle cx="19" cy="21" r="1"></circle>
             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
           </svg>
-        </button>
       </a>
     </div>
   </header>
 
   <main>
     <div class="commission-layout">
-      <form id="request-form" class="request-form" action="/api/commissions" method="post" enctype="multipart/form-data">
+      <h1 class="sr-only" id="commission-heading">Commission request</h1>
+      <form id="request-form" class="request-form" aria-labelledby="commission-heading" action="/api/commissions" method="post" enctype="multipart/form-data">
+        <noscript><p>Enable JavaScript to send a commission request and receive confirmation on this page.</p></noscript>
         <div>
           <label class="field-label" for="commission-description">Description of Commission <span class="required-mark" aria-hidden="true">✦</span></label>
           <textarea class="field-control" id="commission-description" name="description" placeholder="Insert details of commission here..." maxlength="10000" required></textarea>
@@ -110,7 +106,7 @@
           <div class="contact-fields">
             <label>
               <span class="sr-only">Email address</span>
-              <input class="field-control" name="email" type="email" maxlength="254" placeholder="your@email.com" autocomplete="email" required>
+              <input class="field-control" name="email" type="email" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" maxlength="254" placeholder="your@email.com" autocomplete="email" required>
             </label>
             <label>
               <span class="sr-only">Phone number (optional)</span>

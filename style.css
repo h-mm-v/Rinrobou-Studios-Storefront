@@ -1136,6 +1136,46 @@ button {
   background: rgb(199 115 239);
 }
 
+@media (max-width: 1200px) {
+  .cart-layout {
+    width: 88%;
+    margin: 0 6%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .CheckOutForm {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 800px) {
+  .cart-item {
+    grid-template-columns: 36px 88px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 120px;
+    padding: 12px;
+  }
+
+  .cart-item-image {
+    width: 88px;
+    height: 88px;
+  }
+
+  .cart-item-details h2 {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+
+  .cart-item-actions {
+    grid-column: 2 / 4;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    justify-items: start;
+    text-align: left;
+  }
+}
+
 
 /* Pannel CSS */
 .filter-panel {

@@ -13,8 +13,6 @@ interface CommissionRequest {
   attachments: string;
   physical: boolean;
   deadline: string | null;
-  requestAcknowledgement: boolean;
-  termsAccepted: boolean;
 }
 
 const projectRoot = process.cwd();
@@ -91,7 +89,8 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024,
     files: 5,
     fields: 7,
-    fieldSize: 10 * 1024,
+    // Multer counts bytes; a description may contain 10,000 Unicode characters.
+    fieldSize: 40_000,
   },
   fileFilter: (_request, file, callback) => {
     const validExtensions = uploadExtensions[file.mimetype];
@@ -127,10 +126,16 @@ router.post('/api/commissions', upload.array('references', 5), async (request, r
     }
   };
 
-  const description = String(body.description ?? '').trim();
-  const email = String(body.email ?? '').trim();
-  const phone = String(body.phone ?? '').trim();
-  const deadline = String(body.deadline ?? '').trim();
+  if (Object.values(body).some((value) => typeof value !== 'string')) {
+    await removeUploadedFiles();
+    response.status(400).json({ message: 'Submit each form field only once as text.' });
+    return;
+  }
+
+  const description = (body.description ?? '').trim();
+  const email = (body.email ?? '').trim();
+  const phone = (body.phone ?? '').trim();
+  const deadline = (body.deadline ?? '').trim();
   const requestAcknowledgement = body['request-acknowledgement'] === 'on';
   const termsAccepted = body['terms-accepted'] === 'on';
 
@@ -167,8 +172,6 @@ router.post('/api/commissions', upload.array('references', 5), async (request, r
     attachments: JSON.stringify(uploadedFiles.map((file) => file.filename)),
     physical: body['physical-commission'] === 'on',
     deadline: deadline || null,
-    requestAcknowledgement,
-    termsAccepted,
   };
 
   try {
@@ -184,7 +187,14 @@ router.post('/api/commissions', upload.array('references', 5), async (request, r
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
   if (error instanceof multer.MulterError) {
     const status = error.code === 'LIMIT_FILE_SIZE' || error.code === 'LIMIT_FILE_COUNT' ? 413 : 400;
-    response.status(status).json({ message: 'The attached files exceed the allowed upload limits.' });
+    const messages: Record<string, string> = {
+      LIMIT_FILE_SIZE: 'Each attachment must be 5 MB or smaller.',
+      LIMIT_FILE_COUNT: 'Attach no more than 5 files.',
+      LIMIT_UNEXPECTED_FILE: 'Attach no more than 5 files using the reference attachments field.',
+      LIMIT_FIELD_VALUE: 'A form field exceeds the allowed length.',
+      LIMIT_FIELD_COUNT: 'The request contains too many form fields.',
+    };
+    response.status(status).json({ message: messages[error.code] ?? 'The request exceeds the allowed upload limits.' });
     return;
   }
 

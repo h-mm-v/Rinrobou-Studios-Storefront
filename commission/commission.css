@@ -281,6 +281,53 @@
       opacity: 0.65;
     }
 
+    .footer {
+      align-items: center;
+      padding-block: 32px 16px;
+    }
+
+    .footer-logo {
+      width: min(300px, 100%);
+      padding-left: 0;
+      transform: none;
+    }
+
+    .footer-columns {
+      flex-wrap: wrap;
+      gap: 24px;
+      padding-left: 0;
+      transform: none;
+    }
+
+    .footer-art {
+      transform: none;
+    }
+
+    .footer small {
+      position: static;
+      grid-column: 1 / -1;
+      padding-right: 0;
+      text-align: center;
+      transform: none;
+    }
+
+    @media (max-width: 800px) {
+      .navbar {
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        padding-block: 12px;
+      }
+
+      .nav-links {
+        display: flex;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+      }
+    }
+
     @media (max-width: 460px) {
       main {
         padding-inline: 16px;

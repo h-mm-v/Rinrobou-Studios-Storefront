@@ -61,10 +61,10 @@ interface CheckoutRequestBody {
 }
 
 const products: Product[] = [
-  { id: 'donut-float-chibi', name: 'Donut Float Chibi', priceCents: 2000 },
-  { id: 'butler-mage-polaroid', name: 'Butler & Mage Polaroid', priceCents: 2000 },
-  { id: 'halloween-costume-chibi', name: 'Halloween Costume Chibi', priceCents: 2000 },
-  { id: 'pokemon-onesies-chibi', name: 'Pokemon Onesies Chibi', priceCents: 2000 },
+  { id: 'donut-float-chibi', name: 'Donut Float Chibi', priceCents: 2500 },
+  { id: 'butler-mage-polaroid', name: 'Butler & Mage Polaroid', priceCents: 5500 },
+  { id: 'halloween-costume-chibi', name: 'Halloween Costume Chibi', priceCents: 2500 },
+  { id: 'pokemon-onesies-chibi', name: 'Pokemon Onesies Chibi', priceCents: 2500 },
 ];
 const productById = new Map(products.map((product) => [product.id, product]));
 const router = Router();

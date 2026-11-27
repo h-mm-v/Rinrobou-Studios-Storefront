@@ -16,7 +16,7 @@
             <a href="../homepage.html">Home</a>
             <a href="../catalog.html">Catalog</a>
             <a href="../portfolio.html">Portfolio</a>
-            <a href="../src/pages/AboutUsPage.html">About Us</a>
+            <a href="/AboutUsPage.html">About Us</a>
         </nav>
 
         <a href="../homepage.html" class="nav-logo">
@@ -24,23 +24,24 @@
         </a>
 
         <div class="nav-icons">
-            <button class="icon-button" aria-label="Account">
+            <a href="/login.html" class="icon-button" aria-label="Account">
                 <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="8" r="3.5"></circle>
                     <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
                 </svg>
-            </button>
-            <button aria-label="Search">⌕</button>
-            <a href="ShoppingCart.html"><button aria-label="Shopping cart">🛒</button></a>
+            </a>
+            <a href="/SearchResultsPage.html" class="icon-button" aria-label="Search">⌕</a>
+            <a href="/Pages/ShoppingCart.html" class="icon-button" aria-label="Shopping cart" aria-current="page">🛒</a>
         </div>
     </header>
 
     <main class="ShoppingCart-Background">
         <div class="ShoppingCartContainer">
             <h1>Your Cart</h1>
+            <a href="/catalog.html">Continue shopping</a>
             <label class="CheckBox">
                 Select all
-                <input type="checkbox" class="Checkbox" id="select-all-cart-items">
+                <input type="checkbox" class="Checkbox" id="select-all-cart-items" disabled>
             </label>
         </div>
         <hr class="ShoppingCartTopDivider">
@@ -62,8 +63,6 @@
             </form>
         </div>
     </main>
-
-    <script type="module" src="./ShoppingCart.js"></script>
 
     <footer class="footer" id="about">
         <div class="footer-brand">

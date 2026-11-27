@@ -45,6 +45,7 @@ const paymentMethodInput = form?.querySelector<HTMLInputElement>('input[name="pa
 const stripeButton = document.querySelector<HTMLButtonElement>('[data-payment-method="stripe"]');
 const submitButton = form?.querySelector<HTMLButtonElement>('.checkout-submit');
 let checkoutProducts: CheckoutProduct[] = [];
+let loadedCart = '';
 let productsLoaded = false;
 let isVerifyingPayment = false;
 let isSubmitting = false;
@@ -58,11 +59,13 @@ function getCart(): CartItem[] {
   try {
     stored = JSON.parse(localStorage.getItem(cartKey) ?? '[]');
   } catch {
-    return [];
+    throw new Error('Your saved cart could not be read. Return to your cart and try again.');
   }
-  if (!Array.isArray(stored)) return [];
+  if (!Array.isArray(stored)) {
+    throw new Error('Your saved cart is invalid. Return to your cart and try again.');
+  }
 
-  const quantities = new Map<string, number>();
+  const items = new Map<string, CartItem>();
   for (const entry of stored) {
     if (typeof entry !== 'object' || entry === null) continue;
     const item = entry as Record<string, unknown>;
@@ -71,15 +74,19 @@ function getCart(): CartItem[] {
       !item.id ||
       !Number.isInteger(item.quantity) ||
       Number(item.quantity) < 1 ||
-      Number(item.quantity) > 10 ||
-      item.selected === false
+      Number(item.quantity) > 10
     ) {
       continue;
     }
 
-    quantities.set(item.id, Math.min(10, (quantities.get(item.id) ?? 0) + Number(item.quantity)));
+    const existing = items.get(item.id);
+    items.set(item.id, {
+      id: item.id,
+      quantity: Math.min(10, (existing?.quantity ?? 0) + Number(item.quantity)),
+      selected: existing?.selected === true || item.selected !== false,
+    });
   }
-  return Array.from(quantities, ([id, quantity]) => ({ id, quantity }));
+  return [...items.values()].filter((item) => item.selected);
 }
 
 function setStatus(message: string): void {
@@ -96,6 +103,9 @@ function updateSubmitButton(): void {
 async function readJson<T>(response: Response): Promise<T> {
   try {
     const value: unknown = await response.json();
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+      throw new Error('Invalid response.');
+    }
     return value as T;
   } catch {
     throw new Error('The server returned an invalid response. Please try again later.');
@@ -142,14 +152,12 @@ function showPaymentResult(): void {
   const payment = params.get('payment');
 
   if (payment === 'cancelled') {
-    sessionStorage.removeItem(pendingCheckoutKey);
     setStatus('Payment was cancelled. Your cart is still available to try again.');
     return;
   }
   if (payment === 'error') {
     isVerifyingPayment = true;
     updateSubmitButton();
-    sessionStorage.removeItem(pendingCheckoutKey);
     setStatus('We could not verify that payment. Please contact us before trying again.');
     return;
   }
@@ -184,8 +192,9 @@ async function verifyPaymentStatus(url: string): Promise<void> {
         const completedKey = `rinrobou-completed-payment:${sessionId}`;
         const pending = sessionStorage.getItem(pendingCheckoutKey);
         const pendingCheckout = pending ? JSON.parse(pending) : null;
-        const pendingItems: unknown = pendingCheckout?.sessionId === sessionId &&
-          !sessionStorage.getItem(completedKey) ? pendingCheckout.items : [];
+        const matchesPending = pendingCheckout?.sessionId === sessionId &&
+          !sessionStorage.getItem(completedKey);
+        const pendingItems: unknown = matchesPending ? pendingCheckout.items : [];
         const quantities = new Map<string, number>();
         if (Array.isArray(pendingItems)) {
           for (const item of pendingItems) {
@@ -197,21 +206,22 @@ async function verifyPaymentStatus(url: string): Promise<void> {
             }
           }
         }
-        const currentCart = JSON.parse(localStorage.getItem(cartKey) ?? '[]') as unknown;
-        const remaining = Array.isArray(currentCart)
-          ? currentCart.flatMap((item) => {
-              if (typeof item !== 'object' || item === null) return [];
-              const candidate = item as Record<string, unknown>;
-              if (typeof candidate.id !== 'string' || !Number.isInteger(candidate.quantity)) return [];
-              const quantity = Number(candidate.quantity) - (quantities.get(candidate.id) ?? 0);
-              quantities.delete(candidate.id);
-              return quantity > 0 ? [{ ...candidate, quantity }] : [];
-            })
-          : [];
-        if (remaining.length > 0) localStorage.setItem(cartKey, JSON.stringify(remaining));
-        else localStorage.removeItem(cartKey);
-        sessionStorage.setItem(completedKey, 'true');
-        sessionStorage.removeItem(pendingCheckoutKey);
+        if (matchesPending && Array.isArray(pendingItems)) {
+          const currentCart = JSON.parse(localStorage.getItem(cartKey) ?? '[]') as unknown;
+          if (!Array.isArray(currentCart)) throw new Error('Invalid saved cart.');
+          const remaining = currentCart.flatMap((item) => {
+            if (typeof item !== 'object' || item === null) return [];
+            const candidate = item as Record<string, unknown>;
+            if (typeof candidate.id !== 'string' || !Number.isInteger(candidate.quantity)) return [];
+            const quantity = Number(candidate.quantity) - (quantities.get(candidate.id) ?? 0);
+            quantities.delete(candidate.id);
+            return quantity > 0 ? [{ ...candidate, quantity }] : [];
+          });
+          if (remaining.length > 0) localStorage.setItem(cartKey, JSON.stringify(remaining));
+          else localStorage.removeItem(cartKey);
+          sessionStorage.setItem(completedKey, 'true');
+          sessionStorage.removeItem(pendingCheckoutKey);
+        }
       } catch {
         setStatus('Payment completed, but your cart could not be updated. Please review it before ordering again.');
         updateSubmitButton();
@@ -243,7 +253,9 @@ async function loadProducts(): Promise<void> {
     throw new Error('Products could not be loaded. Please try again later.');
   }
 
-  checkoutProducts = getCart().flatMap((item) => {
+  const cart = getCart();
+  loadedCart = JSON.stringify(cart);
+  checkoutProducts = cart.flatMap((item) => {
     const product = catalog.products.find((candidate) => candidate.id === item.id);
     return product ? [{ ...product, quantity: item.quantity }] : [];
   });
@@ -301,12 +313,20 @@ form?.addEventListener('submit', async (event) => {
     setStatus('Please select Stripe as your payment method.');
     return;
   }
+  if (!form.reportValidity()) return;
 
   isSubmitting = true;
   updateSubmitButton();
   setStatus('Starting secure checkout...');
 
   try {
+    if (JSON.stringify(getCart()) !== loadedCart) {
+      await loadProducts();
+      throw new Error('Your cart changed. Review your updated order before continuing.');
+    }
+    // Check storage before creating a payment session so its items can be tracked on return.
+    const pendingCheckout = sessionStorage.getItem(pendingCheckoutKey);
+    sessionStorage.setItem(pendingCheckoutKey, pendingCheckout ?? 'null');
     const termsElement = form.querySelector<HTMLInputElement>('[name="terms-accepted"]');
     const data = new FormData(form);
     const payload = Object.fromEntries(data.entries());
@@ -341,6 +361,25 @@ form?.addEventListener('submit', async (event) => {
 });
 
 updateSubmitButton();
+window.addEventListener('storage', (event) => {
+  if ((event.key === cartKey || event.key === null) && !isVerifyingPayment && !isSubmitting) {
+    productsLoaded = false;
+    updateSubmitButton();
+    void loadProducts().then(() => setStatus('Your cart changed. Review your updated order.')).catch((error: unknown) => {
+      setStatus(error instanceof Error ? error.message : 'Your cart could not be loaded.');
+    });
+  }
+});
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    isSubmitting = false;
+    productsLoaded = false;
+    updateSubmitButton();
+    void loadProducts().catch((error: unknown) => {
+      setStatus(error instanceof Error ? error.message : 'Your cart could not be loaded.');
+    }).finally(showPaymentResult);
+  }
+});
 void loadProducts().catch((error: unknown) => {
   productsLoaded = false;
   updateSubmitButton();

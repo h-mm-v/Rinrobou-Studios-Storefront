@@ -123,7 +123,11 @@ for (const button of catalogButtons) {
       const cart = readCart();
       const existing = cart.find((item) => item.id === productId);
       if (existing) {
-        existing.quantity = Math.min(10, existing.quantity + 1);
+        if (existing.quantity === 10) {
+          showCatalogStatus(`Your bag already contains the maximum of 10 for ${productName}.`, true);
+          return;
+        }
+        existing.quantity += 1;
         existing.selected = true;
       } else {
         cart.push({ id: productId, quantity: 1, selected: true });
@@ -272,6 +276,7 @@ if (cartItemsContainer) {
 
       const allSelected = validItems.length > 0 && validItems.every((item) => item.selected);
       if (selectAll) {
+        selectAll.disabled = validItems.length === 0;
         selectAll.checked = allSelected;
         selectAll.indeterminate = !allSelected && validItems.some((item) => item.selected);
       }
@@ -297,8 +302,9 @@ if (cartItemsContainer) {
       }
     });
     window.addEventListener('storage', (event) => {
-      if (event.key === cartKey) renderCart(catalog);
+      if (event.key === cartKey || event.key === null) renderCart(catalog);
     });
+    window.addEventListener('pageshow', () => renderCart(catalog));
   }).catch((error: unknown) => {
     if (checkoutButton) checkoutButton.disabled = true;
     setCartStatus(error instanceof Error ? error.message : 'The product catalog could not be loaded.');
