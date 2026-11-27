@@ -122,7 +122,7 @@ input:focus-visible {
 
 .check-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 9px;
   color: var(--mint);
   font-size: 0.9rem;
@@ -134,7 +134,7 @@ input:focus-visible {
   width: 30px;
   height: 30px;
   flex: 0 0 30px;
-  margin: 2px 0 0;
+  margin: 0;
   border: 2px solid #91e6d5;
   border-radius: 7px;
   background: rgb(23 15 54 / 90%);

@@ -542,10 +542,6 @@ button {
     font-size: 42px;
   }
 
-  .ShoppingCartContainer label {
-    font-size: 28px;
-  }
-
   .ShoppingCartTopDivider {
     width: 88%;
   }
@@ -897,9 +893,20 @@ button {
 }
 
 
+.cart-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  font-size: clamp(28px, 4vw, 50px);
+}
+
 .ShoppingCartContainer label {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mint);
   font-family: Poppins;
-  font-size: 50px;
+  font-size: inherit;
 }
 
 .CheckBox {
@@ -952,6 +959,13 @@ button {
 
 .ShoppingCart-Background input[type="checkbox"]:hover {
   border-color: var(--pink);
+}
+
+#select-all-cart-items:hover,
+#select-all-cart-items:checked,
+#select-all-cart-items:indeterminate {
+  border-color: var(--mint);
+  background: var(--mint);
 }
 
 .ShoppingCart-Background input[type="checkbox"]:focus-visible {
