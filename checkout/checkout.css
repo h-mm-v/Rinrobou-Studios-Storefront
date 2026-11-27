@@ -58,6 +58,10 @@ main {
   text-align: center;
 }
 
+.back-to-cart {
+  color: var(--pink);
+}
+
 .checkout-panel {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
