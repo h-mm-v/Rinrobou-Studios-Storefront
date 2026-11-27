@@ -3,14 +3,14 @@ import mysql from 'mysql2/promise';
 import path from 'node:path';
 
 const projectRoot = process.cwd();
-const databaseConfig = dotenv.config({ path: path.join(projectRoot, 'databaseDetails.env') }).parsed ?? {};
+const databaseConfig = dotenv.config({ path: path.join(projectRoot, '.env') }).parsed ?? {};
 
 function getDatabaseHost(value: string): string {
   const configuredHost = value.trim();
 
   if (configuredHost.startsWith('://')) {
     throw new Error(
-      'HOST in databaseDetails.env is missing its hostname. Copy the complete database endpoint from AWS into HOST.',
+      'HOST in .env is missing its hostname. Copy the complete database endpoint from AWS into HOST.',
     );
   }
 
@@ -23,14 +23,14 @@ function getDatabaseHost(value: string): string {
       return parsedHost.hostname;
     } catch {
       throw new Error(
-        'HOST in databaseDetails.env must be a valid database hostname or URL. Check the endpoint in AWS.',
+        'HOST in .env must be a valid database hostname or URL. Check the endpoint in AWS.',
       );
     }
   }
 
   if (!configuredHost || configuredHost.includes('/') || /\s/.test(configuredHost)) {
     throw new Error(
-      'HOST in databaseDetails.env must be a complete database endpoint hostname. Check the endpoint in AWS.',
+      'HOST in .env must be a complete database endpoint hostname. Check the endpoint in AWS.',
     );
   }
 
@@ -48,7 +48,7 @@ export function getDatabaseConfig() {
 
   if (!hostValue || !user || !password || !database) {
     throw new Error(
-      'Database configuration is incomplete. Set HOST, USER, PASSWORD, and DATABASE in databaseDetails.env.',
+      'Database configuration is incomplete. Set HOST, USER, PASSWORD, and DATABASE in .env.',
     );
   }
 

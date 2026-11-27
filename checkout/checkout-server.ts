@@ -3,9 +3,9 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import Stripe from 'stripe';
 import { randomUUID } from 'node:crypto';
-import { createDatabaseConnection } from './database.ts';
+import { createDatabaseConnection } from '../database.ts';
 
-type PaymentMethod = 'stripe' | 'paypal' | 'venmo';
+type PaymentMethod = 'stripe';
 
 interface Product {
   id: string;
@@ -30,6 +30,10 @@ interface ShippingDetails {
   postalCode: string;
   country: string;
 }
+
+type ShippingValidationResult =
+  | { valid: true; shipping: ShippingDetails }
+  | { valid: false; message: string };
 
 interface OrderSummary {
   id: string;
@@ -56,25 +60,6 @@ interface CheckoutRequestBody {
   items?: unknown;
 }
 
-interface OrderRow extends RowDataPacket {
-  id: string;
-  public_id: string;
-  payment_method: PaymentMethod;
-  provider_order_id: string | null;
-  payment_status: string;
-}
-
-interface PaymentStatusRow extends RowDataPacket {
-  payment_method: PaymentMethod;
-  payment_status: string;
-}
-
-interface PaypalOrder {
-  id: string;
-  status: string;
-  links?: Array<{ href: string; rel: string }>;
-}
-
 const products: Product[] = [
   { id: 'donut-float-chibi', name: 'Donut Float Chibi', priceCents: 2500 },
   { id: 'butler-mage-polaroid', name: 'Butler & Mage Polaroid', priceCents: 5500 },
@@ -83,12 +68,68 @@ const products: Product[] = [
 ];
 const productById = new Map(products.map((product) => [product.id, product]));
 const router = Router();
+
+export async function initializeCheckoutStorage(): Promise<void> {
+  const connection = await createDatabaseConnection();
+
+  try {
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        public_id CHAR(36) NOT NULL,
+        email VARCHAR(254) NOT NULL,
+        phone VARCHAR(40) NULL,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        shipping_address VARCHAR(255) NOT NULL,
+        shipping_address_extra VARCHAR(255) NULL,
+        shipping_city VARCHAR(100) NOT NULL,
+        shipping_state VARCHAR(100) NOT NULL,
+        shipping_postal_code VARCHAR(20) NOT NULL,
+        shipping_country CHAR(2) NOT NULL,
+        payment_method ENUM('stripe') NOT NULL,
+        provider_order_id VARCHAR(255) NULL,
+        currency CHAR(3) NOT NULL,
+        subtotal_cents BIGINT UNSIGNED NOT NULL,
+        tax_cents BIGINT UNSIGNED NOT NULL,
+        shipping_cents BIGINT UNSIGNED NOT NULL,
+        amount_cents BIGINT UNSIGNED NOT NULL,
+        payment_status ENUM('pending', 'paid', 'failed', 'cancelled') NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_orders_public_id (public_id),
+        KEY idx_orders_payment_provider (payment_method, provider_order_id),
+        KEY idx_orders_email_created (email, created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS products (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        order_id BIGINT UNSIGNED NOT NULL,
+        product_id VARCHAR(100) NOT NULL,
+        product_name VARCHAR(255) NOT NULL,
+        unit_price_cents BIGINT UNSIGNED NOT NULL,
+        quantity TINYINT UNSIGNED NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_products_order_id (order_id),
+        CONSTRAINT fk_products_order
+          FOREIGN KEY (order_id) REFERENCES orders (id)
+          ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+  } finally {
+    await connection.end();
+  }
+}
 const currency = 'USD';
 
 function getPublicBaseUrl(): string {
   const value = process.env.PUBLIC_BASE_URL?.trim();
   if (!value) {
-    throw new Error('Set PUBLIC_BASE_URL in databaseDetails.env before enabling checkout.');
+    throw new Error('Set PUBLIC_BASE_URL in .env before enabling checkout.');
   }
 
   let url: URL;
@@ -100,8 +141,7 @@ function getPublicBaseUrl(): string {
   if ((url.protocol !== 'http:' && url.protocol !== 'https:') || url.username || url.password) {
     throw new Error('PUBLIC_BASE_URL must be a valid http or https URL without credentials.');
   }
-  const liveCredentials =
-    process.env.PAYPAL_ENV === 'live' || process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_') === true;
+  const liveCredentials = process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_') === true;
   if (liveCredentials && url.protocol !== 'https:') {
     throw new Error('PUBLIC_BASE_URL must use HTTPS for live payments.');
   }
@@ -111,32 +151,13 @@ function getPublicBaseUrl(): string {
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY?.trim();
   if (!key) {
-    throw new Error('Stripe checkout is not configured. Set STRIPE_SECRET_KEY in databaseDetails.env.');
+    throw new Error('Stripe checkout is not configured. Set STRIPE_SECRET_KEY in .env.');
   }
   if (key.startsWith('sk_live_') &&
       (process.env.ENABLE_LIVE_PAYMENTS !== 'true' || process.env.LIVE_PRICING_CONFIRMED !== 'true')) {
     throw new Error('Live payments are disabled. Explicitly confirm live tax and shipping settings first.');
   }
   return new Stripe(key);
-}
-
-function getPaypalSettings(): { baseUrl: string; clientId: string; clientSecret: string } {
-  const environment = process.env.PAYPAL_ENV?.trim() || 'sandbox';
-  if (environment !== 'sandbox' && environment !== 'live') {
-    throw new Error('PAYPAL_ENV must be sandbox or live.');
-  }
-  if (environment === 'live' &&
-      (process.env.ENABLE_LIVE_PAYMENTS !== 'true' || process.env.LIVE_PRICING_CONFIRMED !== 'true')) {
-    throw new Error('Live payments are disabled. Explicitly confirm live tax and shipping settings first.');
-  }
-  const clientId = process.env.PAYPAL_CLIENT_ID?.trim();
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET?.trim();
-  if (!clientId || !clientSecret) {
-    throw new Error('PayPal checkout is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET.');
-  }
-  const baseUrl =
-    environment === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
-  return { baseUrl, clientId, clientSecret };
 }
 
 function getTaxAndShipping(subtotalCents: number): {
@@ -155,7 +176,7 @@ function getTaxAndShipping(subtotalCents: number): {
   return { taxCents: Math.round(subtotalCents * taxRate / 100), taxRate, shippingCents };
 }
 
-function validateShipping(body: CheckoutRequestBody): ShippingDetails | null {
+function validateShipping(body: CheckoutRequestBody): ShippingValidationResult {
   const email = String(body.email ?? '').trim();
   const phone = String(body.phone ?? '').trim();
   const firstName = String(body['first-name'] ?? '').trim();
@@ -167,23 +188,39 @@ function validateShipping(body: CheckoutRequestBody): ShippingDetails | null {
   const postalCode = String(body['postal-code'] ?? '').trim();
   const country = String(body.country ?? '').trim().toUpperCase();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return null;
-  if (phone.length > 40 || !firstName || firstName.length > 100 || !lastName || lastName.length > 100) return null;
-  if (!address || address.length > 255 || addressExtra.length > 255) return null;
-  if (!city || city.length > 100 || !state || state.length > 100 || !postalCode || postalCode.length > 20) return null;
-  if (!/^[A-Z]{2}$/.test(country)) return null;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    return { valid: false, message: 'Enter a valid email address.' };
+  }
+  if (phone.length > 40) {
+    return { valid: false, message: 'Phone number must be 40 characters or fewer.' };
+  }
+  if (!firstName || firstName.length > 100 || !lastName || lastName.length > 100) {
+    return { valid: false, message: 'Enter both first and last names (100 characters max each).' };
+  }
+  if (!address || address.length > 255 || addressExtra.length > 255) {
+    return { valid: false, message: 'Enter a street address; apartment/unit must be 255 characters or fewer.' };
+  }
+  if (!city || city.length > 100 || !state || state.length > 100 || !postalCode || postalCode.length > 20) {
+    return { valid: false, message: 'Enter a city, state, and postal code within the allowed lengths.' };
+  }
+  if (!/^[A-Z]{2}$/.test(country)) {
+    return { valid: false, message: 'Enter a two-letter country code, such as US.' };
+  }
 
   return {
-    email,
-    phone: phone || null,
-    firstName,
-    lastName,
-    address,
-    addressExtra: addressExtra || null,
-    city,
-    state,
-    postalCode,
-    country,
+    valid: true,
+    shipping: {
+      email,
+      phone: phone || null,
+      firstName,
+      lastName,
+      address,
+      addressExtra: addressExtra || null,
+      city,
+      state,
+      postalCode,
+      country,
+    },
   };
 }
 
@@ -205,10 +242,6 @@ function validateItems(value: unknown): CartItem[] | null {
     items.push({ product, quantity: Number(quantity) });
   }
   return items;
-}
-
-function formatAmount(cents: number): string {
-  return (cents / 100).toFixed(2);
 }
 
 async function createOrder(
@@ -253,7 +286,7 @@ async function createOrder(
     const orderId = String(orderResult.insertId);
     for (const item of items) {
       await connection.execute(
-        `INSERT INTO order_items (order_id, product_id, product_name, unit_price_cents, quantity)
+        `INSERT INTO products (order_id, product_id, product_name, unit_price_cents, quantity)
          VALUES (?, ?, ?, ?, ?)`,
         [orderId, item.product.id, item.product.name, item.product.priceCents, item.quantity],
       );
@@ -278,186 +311,30 @@ async function setProviderOrder(orderId: string, providerId: string): Promise<vo
 }
 
 async function setPaymentStatus(
-  providerId: string,
-  method: PaymentMethod,
+  session: Stripe.Checkout.Session,
   status: 'paid' | 'failed',
-): Promise<void> {
+): Promise<boolean> {
+  const orderId = session.metadata?.orderId;
+  if (!orderId || session.mode !== 'payment') return false;
   const connection = await createDatabaseConnection();
   try {
+    const [orders] = await connection.execute<RowDataPacket[]>(
+      `SELECT amount_cents, currency FROM orders
+       WHERE id = ? AND payment_method = 'stripe' AND provider_order_id = ?`,
+      [orderId, session.id],
+    );
+    const order = orders[0];
+    if (!order || Number(order.amount_cents) !== session.amount_total ||
+        String(order.currency).toLowerCase() !== session.currency) return false;
     await connection.execute(
       `UPDATE orders SET payment_status = ?
-       WHERE payment_method = ? AND provider_order_id = ? AND payment_status = 'pending'`,
-      [status, method, providerId],
+       WHERE id = ? AND provider_order_id = ? AND payment_status <> 'paid'`,
+      [status, orderId, session.id],
     );
+    return true;
   } finally {
     await connection.end();
   }
-}
-
-async function getPaypalAccessToken(settings: ReturnType<typeof getPaypalSettings>): Promise<string> {
-  const response = await fetch(`${settings.baseUrl}/v1/oauth2/token`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${settings.clientId}:${settings.clientSecret}`).toString('base64')}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
-  });
-  if (!response.ok) {
-    throw new Error(`PayPal authentication failed with status ${response.status}.`);
-  }
-  const data = (await response.json()) as { access_token?: string };
-  if (!data.access_token) throw new Error('PayPal did not return an access token.');
-  return data.access_token;
-}
-
-async function paypalRequest<T>(
-  settings: ReturnType<typeof getPaypalSettings>,
-  accessToken: string,
-  endpoint: string,
-  method: 'POST' | 'GET',
-  body?: unknown,
-): Promise<T> {
-  const response = await fetch(`${settings.baseUrl}${endpoint}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  });
-  if (!response.ok) {
-    throw new Error(`PayPal request failed with status ${response.status}.`);
-  }
-  return (await response.json()) as T;
-}
-
-async function beginPaypalCheckout(
-  order: OrderSummary,
-  shipping: ShippingDetails,
-  items: CartItem[],
-  method: 'paypal' | 'venmo',
-): Promise<string> {
-  const baseUrl = getPublicBaseUrl();
-  const settings = getPaypalSettings();
-  const accessToken = await getPaypalAccessToken(settings);
-  const returnUrl = `${baseUrl}/api/checkout/paypal/return?order_id=${encodeURIComponent(order.publicId)}`;
-  const cancelUrl = `${baseUrl}/checkout.html?payment=cancelled`;
-  const paymentSource = method === 'venmo'
-    ? {
-        venmo: {
-          experience_context: {
-            brand_name: 'Rinrobou Studios',
-            shipping_preference: 'SET_PROVIDED_ADDRESS',
-            user_action: 'PAY_NOW',
-            return_url: returnUrl,
-            cancel_url: cancelUrl,
-          },
-        },
-      }
-    : {
-        paypal: {
-          experience_context: {
-            brand_name: 'Rinrobou Studios',
-            shipping_preference: 'SET_PROVIDED_ADDRESS',
-            user_action: 'PAY_NOW',
-            return_url: returnUrl,
-            cancel_url: cancelUrl,
-          },
-        },
-      };
-  const paypalOrder = await paypalRequest<PaypalOrder>(settings, accessToken, '/v2/checkout/orders', 'POST', {
-    intent: 'CAPTURE',
-    purchase_units: [
-      {
-        reference_id: order.publicId,
-        custom_id: order.publicId,
-        amount: {
-          currency_code: currency,
-          value: formatAmount(order.amountCents),
-          breakdown: {
-            item_total: { currency_code: currency, value: formatAmount(order.subtotalCents) },
-            ...(order.taxCents > 0
-              ? { tax_total: { currency_code: currency, value: formatAmount(order.taxCents) } }
-              : {}),
-            ...(order.shippingCents > 0
-              ? { shipping: { currency_code: currency, value: formatAmount(order.shippingCents) } }
-              : {}),
-          },
-        },
-        items: items.map(({ product, quantity }) => ({
-          name: product.name,
-          quantity: String(quantity),
-          unit_amount: { currency_code: currency, value: formatAmount(product.priceCents) },
-        })),
-        shipping: {
-          name: { full_name: `${shipping.firstName} ${shipping.lastName}` },
-          address: {
-            address_line_1: shipping.address,
-            ...(shipping.addressExtra ? { address_line_2: shipping.addressExtra } : {}),
-            admin_area_2: shipping.city,
-            admin_area_1: shipping.state,
-            postal_code: shipping.postalCode,
-            country_code: shipping.country,
-          },
-        },
-      },
-    ],
-    payment_source: paymentSource,
-  });
-  const actionLink = paypalOrder.links?.find((link) => link.rel === 'payer-action' || link.rel === 'approve');
-  if (!paypalOrder.id || !actionLink?.href) {
-    throw new Error('PayPal did not return a payment approval URL.');
-  }
-  await setProviderOrder(order.id, paypalOrder.id);
-  return actionLink.href;
-}
-
-async function markPaypalOrderPaid(publicId: string, providerId: string): Promise<'paid' | 'pending' | 'invalid'> {
-  const connection = await createDatabaseConnection();
-  let order: OrderRow | undefined;
-  try {
-    const [rows] = await connection.execute<OrderRow[]>(
-      `SELECT id, public_id, payment_method, provider_order_id, payment_status
-       FROM orders WHERE public_id = ? LIMIT 1`,
-      [publicId],
-    );
-    order = rows[0];
-  } finally {
-    await connection.end();
-  }
-
-  if (!order || (order.payment_method !== 'paypal' && order.payment_method !== 'venmo') ||
-      order.provider_order_id !== providerId) {
-    return 'invalid';
-  }
-  if (order.payment_status === 'paid') return 'paid';
-
-  const settings = getPaypalSettings();
-  const accessToken = await getPaypalAccessToken(settings);
-  const paypalOrder = await paypalRequest<PaypalOrder>(
-    settings,
-    accessToken,
-    `/v2/checkout/orders/${encodeURIComponent(providerId)}`,
-    'GET',
-  );
-  if (paypalOrder.status === 'COMPLETED') {
-    await setPaymentStatus(providerId, order.payment_method, 'paid');
-    return 'paid';
-  }
-  if (paypalOrder.status !== 'APPROVED') return 'pending';
-
-  const capture = await paypalRequest<{ status?: string }>(
-    settings,
-    accessToken,
-    `/v2/checkout/orders/${encodeURIComponent(providerId)}/capture`,
-    'POST',
-  );
-  if (capture.status === 'COMPLETED') {
-    await setPaymentStatus(providerId, order.payment_method, 'paid');
-    return 'paid';
-  }
-  return 'pending';
 }
 
 router.get('/api/checkout/products', (_request, response) => {
@@ -470,23 +347,37 @@ router.get('/api/checkout/products', (_request, response) => {
 });
 
 router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Request, response: Response) => {
-  const body = request.body as CheckoutRequestBody;
-  const shipping = validateShipping(body);
+  const body = request.body && typeof request.body === 'object'
+    ? request.body as CheckoutRequestBody
+    : {};
+  const shippingValidation = validateShipping(body);
   const items = validateItems(body.items);
   const method = body['payment-method'];
-  if (!shipping || !items || body['terms-accepted'] !== true ||
-      (method !== 'stripe' && method !== 'paypal' && method !== 'venmo')) {
-    response.status(400).json({ message: 'Check your contact, shipping, cart, payment method, and terms details.' });
+  if (!shippingValidation.valid) {
+    response.status(400).json({ message: shippingValidation.message });
+    return;
+  }
+  if (!items) {
+    response.status(400).json({ message: 'Your cart is empty or contains an invalid item or quantity. Refresh your cart and try again.' });
+    return;
+  }
+  if (body['terms-accepted'] !== true) {
+    response.status(400).json({ message: 'Accept the Terms of Service to continue.' });
+    return;
+  }
+  if (method !== 'stripe') {
+    response.status(400).json({ message: 'Select Stripe to continue.' });
     return;
   }
 
+  const shipping = shippingValidation.shipping;
   try {
     getPublicBaseUrl();
-    if (method === 'stripe') getStripe();
-    else getPaypalSettings();
+    getStripe();
 
     const order = await createOrder(shipping, items, method);
     let redirectUrl: string;
+    let sessionId: string;
     try {
       if (method === 'stripe') {
         const stripe = getStripe();
@@ -522,16 +413,17 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
           mode: 'payment',
           customer_email: shipping.email,
           line_items: lineItems,
-          success_url: `${getPublicBaseUrl()}/checkout.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${getPublicBaseUrl()}/checkout.html?payment=cancelled`,
+          success_url: `${getPublicBaseUrl()}/checkout/?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${getPublicBaseUrl()}/checkout/?payment=cancelled`,
           metadata: { orderId: order.id },
           payment_intent_data: { metadata: { orderId: order.id } },
-        });
+        }, { idempotencyKey: `checkout-${order.publicId}` });
         if (!session.url) throw new Error('Stripe did not return a checkout URL.');
         await setProviderOrder(order.id, session.id);
         redirectUrl = session.url;
+        sessionId = session.id;
       } else {
-        redirectUrl = await beginPaypalCheckout(order, shipping, items, method);
+        throw new Error('Unsupported payment method.');
       }
     } catch (error) {
       console.error(`Failed to start ${method} checkout:`, error);
@@ -548,65 +440,15 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
       return;
     }
 
-    response.status(201).json({ redirectUrl });
+    response.status(201).json({ redirectUrl, sessionId });
   } catch (error) {
     console.error('Failed to create checkout:', error);
     response.status(500).json({ message: 'Checkout could not be started. Please try again later.' });
   }
 });
 
-router.get('/api/checkout/paypal/return', async (request, response) => {
-  const publicId = typeof request.query.order_id === 'string' ? request.query.order_id : '';
-  const providerId = typeof request.query.token === 'string' ? request.query.token : '';
-  if (!publicId || !providerId) {
-    response.redirect('/checkout.html?payment=error');
-    return;
-  }
-
-  try {
-    const status = await markPaypalOrderPaid(publicId, providerId);
-    if (status === 'invalid') {
-      response.redirect('/checkout.html?payment=error');
-      return;
-    }
-    response.redirect(`/checkout.html?payment=${status}&order_id=${encodeURIComponent(publicId)}`);
-  } catch (error) {
-    console.error('Failed to capture PayPal/Venmo order:', error);
-    response.redirect('/checkout.html?payment=pending');
-  }
-});
-
 router.get('/api/checkout/payment-status', async (request, response) => {
-  const publicOrderId = typeof request.query.order_id === 'string' ? request.query.order_id : '';
-  if (publicOrderId) {
-    if (publicOrderId.length !== 36) {
-      response.status(400).json({ message: 'Invalid order identifier.' });
-      return;
-    }
-    try {
-      const connection = await createDatabaseConnection();
-      let order: PaymentStatusRow | undefined;
-      try {
-        const [rows] = await connection.execute<PaymentStatusRow[]>(
-          'SELECT payment_method, payment_status FROM orders WHERE public_id = ? LIMIT 1',
-          [publicOrderId],
-        );
-        order = rows[0];
-      } finally {
-        await connection.end();
-      }
-      if (!order || (order.payment_method !== 'paypal' && order.payment_method !== 'venmo')) {
-        response.status(404).json({ message: 'Order not found.' });
-        return;
-      }
-      response.json({ status: order.payment_status });
-    } catch (error) {
-      console.error('Failed to check PayPal/Venmo payment status:', error);
-      response.status(500).json({ message: 'Payment status is not available yet.' });
-    }
-    return;
-  }
-
+  response.setHeader('Cache-Control', 'no-store');
   const sessionId = typeof request.query.session_id === 'string' ? request.query.session_id : '';
   if (!sessionId || sessionId.length > 255) {
     response.status(400).json({ message: 'Invalid payment session.' });
@@ -621,8 +463,16 @@ router.get('/api/checkout/payment-status', async (request, response) => {
       return;
     }
     if (session.payment_status === 'paid') {
-      await setPaymentStatus(session.id, 'stripe', 'paid');
+      if (!await setPaymentStatus(session, 'paid')) {
+        response.status(409).json({ message: 'Payment does not match a stored order. Please contact us.' });
+        return;
+      }
       response.json({ status: 'paid' });
+      return;
+    }
+    if (session.status === 'expired') {
+      await setPaymentStatus(session, 'failed');
+      response.json({ status: 'failed' });
       return;
     }
     response.json({ status: 'pending' });
@@ -652,11 +502,15 @@ router.post('/api/webhooks/stripe', express.raw({ type: 'application/json', limi
     if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.payment_status === 'paid') {
-        await setPaymentStatus(session.id, 'stripe', 'paid');
+        if (!await setPaymentStatus(session, 'paid')) {
+          // Retry if the event arrived before the session was linked to its order.
+          response.sendStatus(500);
+          return;
+        }
       }
     } else if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      await setPaymentStatus(session.id, 'stripe', 'failed');
+      await setPaymentStatus(session, 'failed');
     }
     response.sendStatus(200);
   } catch (error) {

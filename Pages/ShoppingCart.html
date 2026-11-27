@@ -13,63 +13,58 @@
 <body>
     <header class="navbar">
         <nav class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#catalog">Catalog</a>
-            <a href="#portfolio">Portfolio</a>
-            <a href="#about">About Us</a>
+            <a href="../homepage.html">Home</a>
+            <a href="../catalog.html">Catalog</a>
+            <a href="../portfolio.html">Portfolio</a>
+            <a href="/AboutUsPage.html">About Us</a>
         </nav>
 
-        <a href="#home" class="nav-logo">
+        <a href="../homepage.html" class="nav-logo">
             <img src="../src/assets/logo-small.png" alt="RinRobou Studios" />
         </a>
 
         <div class="nav-icons">
-            <button class="icon-button" aria-label="Account">
+            <a href="/login.html" class="icon-button" aria-label="Account">
                 <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="8" r="3.5"></circle>
                     <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
                 </svg>
-            </button>
-            <button aria-label="Search">⌕</button>
-            <button aria-label="Shopping cart">🛒</button>
+            </a>
+            <a href="/SearchResultsPage.html" class="icon-button" aria-label="Search">⌕</a>
+            <a href="/Pages/ShoppingCart.html" class="icon-button" aria-label="Shopping cart" aria-current="page">🛒</a>
         </div>
     </header>
 
     <main class="ShoppingCart-Background">
         <div class="ShoppingCartContainer">
             <h1>Your Cart</h1>
-            <label class="CheckBox">
-                <!--NEED TO FIX CHECKBOX LOCATION-->
-                Select all
-                <input type="checkbox" class="Checkbox" id="select-all">
-            </label>
-            <ul id="cart-items"></ul>
-            <hr class="ShoppingCartTopDivider">
-        </div>
-
-
-
-
-        <form class="CheckOutForm" id="checkout-form">
-            <div class="CheckoutSubtotal">
-                <p>
-                    Subtotal (<span id="item-amt">0</span> items):
-                    $<span id="sub-cost">0.00</span>
-                </p>
-                <label>
-                    <input type="checkbox" class="Checkbox" required>
-                    Confirm Order
+            <div class="cart-header-actions">
+                <a href="/catalog.html">Continue shopping</a>
+                <label class="CheckBox">
+                    <input type="checkbox" class="Checkbox" id="select-all-cart-items" disabled>
+                    Select all
                 </label>
             </div>
-            <div class="ProceedToCheckoutButton">
-                <button type="submit" class="button">
-                    Proceed to Checkout
-                </button>
+        </div>
+        <hr class="ShoppingCartTopDivider">
+        <div class="cart-layout">
+            <div class="cart-content">
+                <div id="cart-items" aria-live="polite"></div>
+                <p id="cart-page-status" role="status" aria-live="polite"></p>
             </div>
-        </form>
-    </main>
 
-    <script type="module" src="./ShoppingCart.js"></script>
+            <form class="CheckOutForm" id="cart-checkout-form">
+                <div class="CheckoutSubtotal">
+                    <p>
+                        Subtotal (<span id="cart-item-count">0</span>): <span id="cart-subtotal">$0.00</span>
+                    </p>
+                </div>
+                <div class="ProceedToCheckoutButton">
+                    <button type="submit" class="button" disabled>Proceed to Checkout</button>
+                </div>
+            </form>
+        </div>
+    </main>
 
     <footer class="footer" id="about">
         <div class="footer-brand">
@@ -100,6 +95,7 @@
 
         <small>©2027 RinRobou Studios, All Rights Reserved</small>
     </footer>
+    <script type="module" src="/storefront-cart.js"></script>
 </body>
 
 </html>

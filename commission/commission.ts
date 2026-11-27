@@ -1,7 +1,7 @@
 import mysql, { type ResultSetHeader } from 'mysql2/promise';
 import dotenv from 'dotenv';
 
-const databaseConfig = dotenv.config({ path: 'databaseDetails.env' }).parsed ?? {};
+const databaseConfig = dotenv.config({ path: '.env' }).parsed ?? {};
 
 interface CommissionRequest {
   email: string;
