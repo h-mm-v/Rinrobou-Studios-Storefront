@@ -25,8 +25,10 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.get("/api/products", async (req: Request, res: Response) => {
   try {
+    const requestedPageSize = Number(req.query.pageSize) || 12;
     const page = Math.max(Number(req.query.page) || 1, 1);
-    const pageSize = 12;
+    const pageSize = Math.min(requestedPageSize, 12);
+
     const offset = (page - 1) * pageSize;
 
     const conditions: string[] = [];
