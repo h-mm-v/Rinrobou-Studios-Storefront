@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "catalog.html";
         }
     });
-    
+
     /* Licensing */
     const basePrice = 65; // temp
 
@@ -83,10 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
     changeTab("description");
 
     /* Product Carousel */
-    const productImages: string[] = [
-        "Product Image 1",
-        "Product Image 2",
-        "Product Image 3"
+    let productImages: string[] = [
+        "/src/assets/halfchibi 1.png",
+        "/src/assets/halfchibi 2.png",
+        "/src/assets/halfchibi 3.png"
     ];
 
     let currentImageIndex = 0;
@@ -95,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "#current-product-image"
     );
 
-    const thumbnails = document.querySelectorAll<HTMLButtonElement>(
-        ".product-page .thumbnail"
+    const thumbnails = document.querySelector<HTMLElement>(
+        "#product-thumbnails"
     );
 
     const prevButton = document.querySelector<HTMLButtonElement>(
@@ -108,26 +108,73 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     function updateImage(index: number): void {
+        if (!mainImage || !thumbnails) return;
+
+        if (productImages.length === 0) {
+            mainImage.textContent = "No image available";
+            thumbnails.replaceChildren();
+            return;
+        }
+
         currentImageIndex =
             (index + productImages.length) % productImages.length;
 
-        if (mainImage) {
-            mainImage.textContent = productImages[currentImageIndex];
-        }
+        const image = document.createElement("img");
+        image.src = productImages[currentImageIndex];
+        image.alt = `Product image ${currentImageIndex + 1}`;
 
-        thumbnails.forEach((thumbnail, i) => {
+        mainImage.replaceChildren(image);
+
+        thumbnails.querySelectorAll<HTMLButtonElement>(
+            ".thumbnail"
+        ).forEach((thumbnail, i) => {
             const active = i === currentImageIndex;
 
             thumbnail.classList.toggle("active", active);
             thumbnail.setAttribute("aria-pressed", String(active));
+
+            if (active) {
+                thumbnail.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "nearest"
+                });
+            }
         });
     }
 
-    thumbnails.forEach((thumbnail, index) => {
-        thumbnail.addEventListener("click", () => {
-            updateImage(index);
+    function updateGallery(images: string[]): void {
+        productImages = images;
+        currentImageIndex = 0;
+
+        if (!thumbnails) return;
+
+        thumbnails.replaceChildren();
+
+        productImages.forEach((imagePath, index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "thumbnail";
+            button.setAttribute(
+                "aria-label",
+                `View product image ${index + 1}`
+            );
+
+            const image = document.createElement("img");
+            image.src = imagePath;
+            image.alt = "";
+
+            button.appendChild(image);
+
+            button.addEventListener("click", () => {
+                updateImage(index);
+            });
+
+            thumbnails.appendChild(button);
         });
-    });
+
+        updateImage(0);
+    }
 
     prevButton?.addEventListener("click", () => {
         updateImage(currentImageIndex - 1);
@@ -137,7 +184,157 @@ document.addEventListener("DOMContentLoaded", () => {
         updateImage(currentImageIndex + 1);
     });
 
-    updateImage(0);
+    updateGallery(productImages);
+
+    /* Image Lightbox */
+    const lightbox = document.querySelector<HTMLElement>(
+        "#image-lightbox"
+    );
+
+    const lightboxImage = document.querySelector<HTMLImageElement>(
+        "#lightbox-image"
+    );
+
+    const lightboxCounter = document.querySelector<HTMLElement>(
+        "#lightbox-counter"
+    );
+
+    const closeLightboxButton = document.querySelector<HTMLButtonElement>(
+        "#close-lightbox"
+    );
+
+    const lightboxPrev = document.querySelector<HTMLButtonElement>(
+        "#lightbox-prev"
+    );
+
+    const lightboxNext = document.querySelector<HTMLButtonElement>(
+        "#lightbox-next"
+    );
+
+    let lightboxOpen = false;
+    let previousFocus: HTMLElement | null = null;
+
+    function updateLightboxImage(): void {
+        if (!lightboxImage || productImages.length === 0) return;
+
+        lightboxImage.src = productImages[currentImageIndex];
+        lightboxImage.alt = `Product image ${currentImageIndex + 1}`;
+
+        if (lightboxCounter) {
+            lightboxCounter.replaceChildren();
+
+            productImages.forEach((_, index) => {
+                const dot = document.createElement("button");
+
+                dot.type = "button";
+                dot.className = "lightbox-dot";
+                dot.setAttribute(
+                    "aria-label",
+                    `View image ${index + 1}`
+                );
+
+                const active = index === currentImageIndex;
+
+                dot.classList.toggle("active", active);
+                dot.setAttribute("aria-pressed", String(active));
+
+                dot.addEventListener("click", () => {
+                    updateImage(index);
+                    updateLightboxImage();
+                });
+
+                lightboxCounter.appendChild(dot);
+            });
+        }
+    }
+
+    function openLightbox(): void {
+        if (!lightbox || productImages.length === 0) return;
+
+        previousFocus = document.activeElement as HTMLElement | null;
+        lightbox.hidden = false;
+        lightboxOpen = true;
+
+        document.body.style.overflow = "hidden";
+
+        updateLightboxImage();
+        closeLightboxButton?.focus();
+    }
+
+    function closeLightbox(): void {
+        if (!lightbox) return;
+
+        lightbox.hidden = true;
+        lightboxOpen = false;
+
+        document.body.style.overflow = "";
+        previousFocus?.focus();
+    }
+
+    mainImage?.addEventListener("click", () => {
+        openLightbox();
+    });
+
+    closeLightboxButton?.addEventListener("click", closeLightbox);
+
+    lightboxPrev?.addEventListener("click", () => {
+        updateImage(currentImageIndex - 1);
+        updateLightboxImage();
+    });
+
+    lightboxNext?.addEventListener("click", () => {
+        updateImage(currentImageIndex + 1);
+        updateLightboxImage();
+    });
+
+    lightbox?.addEventListener("click", (event) => {
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (!lightboxOpen) return;
+
+        if (event.key === "Escape") {
+            closeLightbox();
+        }
+
+        if (event.key === "ArrowLeft") {
+            updateImage(currentImageIndex - 1);
+            updateLightboxImage();
+        }
+
+        if (event.key === "ArrowRight") {
+            updateImage(currentImageIndex + 1);
+            updateLightboxImage();
+        }
+
+        if (event.key === "Tab") {
+            const controls = [
+                closeLightboxButton,
+                lightboxPrev,
+                lightboxNext
+            ].filter((button): button is HTMLButtonElement =>
+                button !== null && !button.disabled
+            );
+
+            if (controls.length === 0) return;
+
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+
+            if (event.shiftKey &&
+                document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey &&
+                document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    });
 
     /* Bookmark */
     const bookmarkButton = document.querySelector<HTMLButtonElement>(
