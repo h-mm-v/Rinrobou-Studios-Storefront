@@ -38,21 +38,23 @@
     <main class="ShoppingCart-Background">
         <div class="ShoppingCartContainer">
             <h1>Your Cart</h1>
-            <label class = "CheckBox">
+            <label class="CheckBox">
                 <!--NEED TO FIX CHECKBOX LOCATION-->
                 Select all
-                <input type="checkbox" class="Checkbox" required>
+                <input type="checkbox" class="Checkbox" id="select-all">
             </label>
+            <ul id="cart-items"></ul>
             <hr class="ShoppingCartTopDivider">
         </div>
 
 
 
 
-        <form class="CheckOutForm">
+        <form class="CheckOutForm" id="checkout-form">
             <div class="CheckoutSubtotal">
                 <p>
-                    Subtotal ([item_amt]): $[sub_cost]
+                    Subtotal (<span id="item-amt">0</span> items):
+                    $<span id="sub-cost">0.00</span>
                 </p>
                 <label>
                     <input type="checkbox" class="Checkbox" required>
@@ -61,11 +63,13 @@
             </div>
             <div class="ProceedToCheckoutButton">
                 <button type="submit" class="button">
-                    <a href="../checkout.html">Proceed to Checkout</a>
+                    Proceed to Checkout
                 </button>
             </div>
         </form>
     </main>
+
+    <script type="module" src="./ShoppingCart.js"></script>
 
     <footer class="footer" id="about">
         <div class="footer-brand">
