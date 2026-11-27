@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import Stripe from 'stripe';
 import { randomUUID } from 'node:crypto';
-import { createDatabaseConnection } from './database.ts';
+import { createDatabaseConnection } from '../database.ts';
 
 type PaymentMethod = 'stripe' | 'paypal' | 'venmo';
 
@@ -30,6 +30,10 @@ interface ShippingDetails {
   postalCode: string;
   country: string;
 }
+
+type ShippingValidationResult =
+  | { valid: true; shipping: ShippingDetails }
+  | { valid: false; message: string };
 
 interface OrderSummary {
   id: string;
@@ -83,6 +87,62 @@ const products: Product[] = [
 ];
 const productById = new Map(products.map((product) => [product.id, product]));
 const router = Router();
+
+export async function initializeCheckoutStorage(): Promise<void> {
+  const connection = await createDatabaseConnection();
+
+  try {
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        public_id CHAR(36) NOT NULL,
+        email VARCHAR(254) NOT NULL,
+        phone VARCHAR(40) NULL,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        shipping_address VARCHAR(255) NOT NULL,
+        shipping_address_extra VARCHAR(255) NULL,
+        shipping_city VARCHAR(100) NOT NULL,
+        shipping_state VARCHAR(100) NOT NULL,
+        shipping_postal_code VARCHAR(20) NOT NULL,
+        shipping_country CHAR(2) NOT NULL,
+        payment_method ENUM('stripe', 'paypal', 'venmo') NOT NULL,
+        provider_order_id VARCHAR(255) NULL,
+        currency CHAR(3) NOT NULL,
+        subtotal_cents BIGINT UNSIGNED NOT NULL,
+        tax_cents BIGINT UNSIGNED NOT NULL,
+        shipping_cents BIGINT UNSIGNED NOT NULL,
+        amount_cents BIGINT UNSIGNED NOT NULL,
+        payment_status ENUM('pending', 'paid', 'failed', 'cancelled') NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_orders_public_id (public_id),
+        KEY idx_orders_payment_provider (payment_method, provider_order_id),
+        KEY idx_orders_email_created (email, created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS products (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        order_id BIGINT UNSIGNED NOT NULL,
+        product_id VARCHAR(100) NOT NULL,
+        product_name VARCHAR(255) NOT NULL,
+        unit_price_cents BIGINT UNSIGNED NOT NULL,
+        quantity TINYINT UNSIGNED NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_products_order_id (order_id),
+        CONSTRAINT fk_products_order
+          FOREIGN KEY (order_id) REFERENCES orders (id)
+          ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+  } finally {
+    await connection.end();
+  }
+}
 const currency = 'USD';
 
 function getPublicBaseUrl(): string {
@@ -155,7 +215,7 @@ function getTaxAndShipping(subtotalCents: number): {
   return { taxCents: Math.round(subtotalCents * taxRate / 100), taxRate, shippingCents };
 }
 
-function validateShipping(body: CheckoutRequestBody): ShippingDetails | null {
+function validateShipping(body: CheckoutRequestBody): ShippingValidationResult {
   const email = String(body.email ?? '').trim();
   const phone = String(body.phone ?? '').trim();
   const firstName = String(body['first-name'] ?? '').trim();
@@ -167,23 +227,39 @@ function validateShipping(body: CheckoutRequestBody): ShippingDetails | null {
   const postalCode = String(body['postal-code'] ?? '').trim();
   const country = String(body.country ?? '').trim().toUpperCase();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return null;
-  if (phone.length > 40 || !firstName || firstName.length > 100 || !lastName || lastName.length > 100) return null;
-  if (!address || address.length > 255 || addressExtra.length > 255) return null;
-  if (!city || city.length > 100 || !state || state.length > 100 || !postalCode || postalCode.length > 20) return null;
-  if (!/^[A-Z]{2}$/.test(country)) return null;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    return { valid: false, message: 'Enter a valid email address.' };
+  }
+  if (phone.length > 40) {
+    return { valid: false, message: 'Phone number must be 40 characters or fewer.' };
+  }
+  if (!firstName || firstName.length > 100 || !lastName || lastName.length > 100) {
+    return { valid: false, message: 'Enter both first and last names (100 characters max each).' };
+  }
+  if (!address || address.length > 255 || addressExtra.length > 255) {
+    return { valid: false, message: 'Enter a street address; apartment/unit must be 255 characters or fewer.' };
+  }
+  if (!city || city.length > 100 || !state || state.length > 100 || !postalCode || postalCode.length > 20) {
+    return { valid: false, message: 'Enter a city, state, and postal code within the allowed lengths.' };
+  }
+  if (!/^[A-Z]{2}$/.test(country)) {
+    return { valid: false, message: 'Enter a two-letter country code, such as US.' };
+  }
 
   return {
-    email,
-    phone: phone || null,
-    firstName,
-    lastName,
-    address,
-    addressExtra: addressExtra || null,
-    city,
-    state,
-    postalCode,
-    country,
+    valid: true,
+    shipping: {
+      email,
+      phone: phone || null,
+      firstName,
+      lastName,
+      address,
+      addressExtra: addressExtra || null,
+      city,
+      state,
+      postalCode,
+      country,
+    },
   };
 }
 
@@ -253,7 +329,7 @@ async function createOrder(
     const orderId = String(orderResult.insertId);
     for (const item of items) {
       await connection.execute(
-        `INSERT INTO order_items (order_id, product_id, product_name, unit_price_cents, quantity)
+        `INSERT INTO products (order_id, product_id, product_name, unit_price_cents, quantity)
          VALUES (?, ?, ?, ?, ?)`,
         [orderId, item.product.id, item.product.name, item.product.priceCents, item.quantity],
       );
@@ -342,7 +418,7 @@ async function beginPaypalCheckout(
   const settings = getPaypalSettings();
   const accessToken = await getPaypalAccessToken(settings);
   const returnUrl = `${baseUrl}/api/checkout/paypal/return?order_id=${encodeURIComponent(order.publicId)}`;
-  const cancelUrl = `${baseUrl}/checkout.html?payment=cancelled`;
+  const cancelUrl = `${baseUrl}/checkout/?payment=cancelled`;
   const paymentSource = method === 'venmo'
     ? {
         venmo: {
@@ -471,15 +547,27 @@ router.get('/api/checkout/products', (_request, response) => {
 
 router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Request, response: Response) => {
   const body = request.body as CheckoutRequestBody;
-  const shipping = validateShipping(body);
+  const shippingValidation = validateShipping(body);
   const items = validateItems(body.items);
   const method = body['payment-method'];
-  if (!shipping || !items || body['terms-accepted'] !== true ||
-      (method !== 'stripe' && method !== 'paypal' && method !== 'venmo')) {
-    response.status(400).json({ message: 'Check your contact, shipping, cart, payment method, and terms details.' });
+  if (!shippingValidation.valid) {
+    response.status(400).json({ message: shippingValidation.message });
+    return;
+  }
+  if (!items) {
+    response.status(400).json({ message: 'Your cart is empty or contains an invalid item or quantity. Refresh your cart and try again.' });
+    return;
+  }
+  if (body['terms-accepted'] !== true) {
+    response.status(400).json({ message: 'Accept the Terms of Service to continue.' });
+    return;
+  }
+  if (method !== 'stripe' && method !== 'paypal' && method !== 'venmo') {
+    response.status(400).json({ message: 'Select PayPal, Venmo, or Stripe to continue.' });
     return;
   }
 
+  const shipping = shippingValidation.shipping;
   try {
     getPublicBaseUrl();
     if (method === 'stripe') getStripe();
@@ -522,8 +610,8 @@ router.post('/api/checkout', express.json({ limit: '16kb' }), async (request: Re
           mode: 'payment',
           customer_email: shipping.email,
           line_items: lineItems,
-          success_url: `${getPublicBaseUrl()}/checkout.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${getPublicBaseUrl()}/checkout.html?payment=cancelled`,
+          success_url: `${getPublicBaseUrl()}/checkout/?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${getPublicBaseUrl()}/checkout/?payment=cancelled`,
           metadata: { orderId: order.id },
           payment_intent_data: { metadata: { orderId: order.id } },
         });
@@ -559,20 +647,20 @@ router.get('/api/checkout/paypal/return', async (request, response) => {
   const publicId = typeof request.query.order_id === 'string' ? request.query.order_id : '';
   const providerId = typeof request.query.token === 'string' ? request.query.token : '';
   if (!publicId || !providerId) {
-    response.redirect('/checkout.html?payment=error');
+    response.redirect('/checkout/?payment=error');
     return;
   }
 
   try {
     const status = await markPaypalOrderPaid(publicId, providerId);
     if (status === 'invalid') {
-      response.redirect('/checkout.html?payment=error');
+      response.redirect('/checkout/?payment=error');
       return;
     }
-    response.redirect(`/checkout.html?payment=${status}&order_id=${encodeURIComponent(publicId)}`);
+    response.redirect(`/checkout/?payment=${status}&order_id=${encodeURIComponent(publicId)}`);
   } catch (error) {
     console.error('Failed to capture PayPal/Venmo order:', error);
-    response.redirect('/checkout.html?payment=pending');
+    response.redirect('/checkout/?payment=pending');
   }
 });
 

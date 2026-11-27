@@ -17,6 +17,8 @@ interface CartItem {
 const cartKey = 'rinrobou-cart';
 const cartStatus = document.querySelector<HTMLElement>('#cart-status');
 const catalogButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-product-id]')];
+let cartStatusTimer: ReturnType<typeof setTimeout> | undefined;
+let cartStatusHideTimer: ReturnType<typeof setTimeout> | undefined;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -90,40 +92,47 @@ function displayAmount(cents: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 }
 
-function showCatalogStatus(message: string): void {
-  if (cartStatus) cartStatus.textContent = message;
+function showCatalogStatus(message: string, isError = false): void {
+  if (!cartStatus) return;
+
+  if (cartStatusTimer) clearTimeout(cartStatusTimer);
+  if (cartStatusHideTimer) clearTimeout(cartStatusHideTimer);
+  cartStatus.textContent = message;
+  cartStatus.classList.toggle('is-error', isError);
+  cartStatus.hidden = false;
+  requestAnimationFrame(() => cartStatus.classList.add('is-visible'));
+
+  cartStatusTimer = setTimeout(() => {
+    cartStatus.classList.remove('is-visible');
+    cartStatusHideTimer = setTimeout(() => {
+      cartStatus.hidden = true;
+    }, 200);
+  }, isError ? 6000 : 3200);
 }
 
-if (catalogButtons.length > 0) {
-  void loadCatalog().then((catalog) => {
-    const productsById = new Map(catalog.products.map((product) => [product.id, product]));
-    for (const button of catalogButtons) {
-      const productId = button.dataset.productId;
-      if (!productId || !productsById.has(productId)) {
-        button.disabled = true;
-        continue;
-      }
+for (const button of catalogButtons) {
+  const productId = button.dataset.productId;
+  const productName = button.dataset.productName?.trim();
+  if (!productId || !productName) {
+    button.disabled = true;
+    continue;
+  }
 
-      button.addEventListener('click', () => {
-        try {
-          const cart = readCart();
-          const existing = cart.find((item) => item.id === productId);
-          if (existing) {
-            existing.quantity = Math.min(10, existing.quantity + 1);
-            existing.selected = true;
-          } else {
-            cart.push({ id: productId, quantity: 1, selected: true });
-          }
-          saveCart(cart);
-          showCatalogStatus(`${productsById.get(productId)?.name} added to your bag.`);
-        } catch (error) {
-          showCatalogStatus(error instanceof Error ? error.message : 'The item could not be added.');
-        }
-      });
+  button.addEventListener('click', () => {
+    try {
+      const cart = readCart();
+      const existing = cart.find((item) => item.id === productId);
+      if (existing) {
+        existing.quantity = Math.min(10, existing.quantity + 1);
+        existing.selected = true;
+      } else {
+        cart.push({ id: productId, quantity: 1, selected: true });
+      }
+      saveCart(cart);
+      showCatalogStatus(`${productName} added to your bag.`);
+    } catch (error) {
+      showCatalogStatus(error instanceof Error ? error.message : 'The item could not be added.', true);
     }
-  }).catch((error: unknown) => {
-    for (const button of catalogButtons) button.disabled = true;
-    showCatalogStatus(error instanceof Error ? error.message : 'The product catalog could not be loaded.');
   });
 }
 
@@ -141,6 +150,13 @@ if (cartItemsContainer) {
     if (statusElement) statusElement.textContent = message;
   }
 
+  const productImages: Record<string, string> = {
+    'donut-float-chibi': '/src/assets/donut-float.png',
+    'butler-mage-polaroid': '/src/assets/butler-mage.png',
+    'halloween-costume-chibi': '/src/assets/halloween-chibi.png',
+    'pokemon-onesies-chibi': '/src/assets/valentines-chibi.png',
+  };
+
   function renderCart(catalog: ProductCatalog): void {
     try {
       const cart = readCart();
@@ -157,15 +173,38 @@ if (cartItemsContainer) {
         if (!product) continue;
 
         const row = document.createElement('article');
+        row.className = 'cart-item';
+
+        const selection = document.createElement('div');
+        selection.className = 'cart-item-selection';
         const label = document.createElement('label');
         const selected = document.createElement('input');
         selected.type = 'checkbox';
         selected.checked = item.selected;
         selected.setAttribute('aria-label', `Select ${product.name}`);
-        label.append(selected, document.createTextNode(` ${product.name}`));
+        label.append(selected);
+        selection.append(label);
 
-        const price = document.createElement('span');
-        price.textContent = ` ${displayAmount(product.priceCents)} each`;
+        const image = document.createElement('img');
+        image.className = 'cart-item-image';
+        image.src = productImages[product.id] ?? '/src/assets/logo-small.png';
+        image.alt = product.name;
+
+        const details = document.createElement('div');
+        details.className = 'cart-item-details';
+        const name = document.createElement('h2');
+        name.textContent = product.name;
+        const price = document.createElement('p');
+        price.className = 'cart-item-unit-price';
+        price.textContent = `${displayAmount(product.priceCents)} each`;
+        details.append(name, price);
+
+        const actions = document.createElement('div');
+        actions.className = 'cart-item-actions';
+        const quantityLabel = document.createElement('label');
+        quantityLabel.className = 'cart-item-quantity';
+        const quantityText = document.createElement('span');
+        quantityText.textContent = 'Quantity';
 
         const quantity = document.createElement('input');
         quantity.type = 'number';
@@ -174,15 +213,20 @@ if (cartItemsContainer) {
         quantity.step = '1';
         quantity.value = String(item.quantity);
         quantity.setAttribute('aria-label', `Quantity for ${product.name}`);
+        quantityLabel.append(quantityText, quantity);
 
-        const lineTotal = document.createElement('span');
-        lineTotal.textContent = ` ${displayAmount(product.priceCents * item.quantity)}`;
+        const lineTotal = document.createElement('strong');
+        lineTotal.className = 'cart-item-line-total';
+        lineTotal.textContent = displayAmount(product.priceCents * item.quantity);
 
         const remove = document.createElement('button');
         remove.type = 'button';
+        remove.className = 'cart-item-remove';
         remove.textContent = 'Remove';
         remove.setAttribute('aria-label', `Remove ${product.name} from your cart`);
-        row.append(label, price, quantity, lineTotal, remove);
+        actions.append(quantityLabel, lineTotal, remove);
+
+        row.append(selection, image, details, actions);
         cartItems.append(row);
 
         if (item.selected) {
@@ -268,7 +312,7 @@ if (cartItemsContainer) {
         setCartStatus('Select at least one item before checkout.');
         return;
       }
-      window.location.assign('../checkout.html');
+      window.location.assign('/checkout/');
     } catch (error) {
       setCartStatus(error instanceof Error ? error.message : 'Checkout could not be opened.');
     }

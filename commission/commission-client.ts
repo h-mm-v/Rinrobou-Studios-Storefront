@@ -6,6 +6,18 @@ if (!(form instanceof HTMLFormElement)) {
 
 const submitButton = form.querySelector('button[type="submit"]');
 const statusMessage = form.querySelector('[role="status"]');
+const referenceFiles = form.querySelector('#reference-files');
+const fileHelp = form.querySelector('.file-help');
+
+if (referenceFiles instanceof HTMLInputElement && fileHelp instanceof HTMLElement) {
+  referenceFiles.addEventListener('change', () => {
+    const count = referenceFiles.files?.length ?? 0;
+    fileHelp.textContent =
+      count === 0
+        ? 'Images and PDF files are welcome.'
+        : `${count} file${count === 1 ? '' : 's'} selected (maximum 5).`;
+  });
+}
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -30,6 +42,9 @@ form.addEventListener('submit', async (event) => {
 
     statusMessage.textContent = result.message ?? 'Your commission request was sent successfully.';
     form.reset();
+    if (fileHelp instanceof HTMLElement) {
+      fileHelp.textContent = 'Images and PDF files are welcome.';
+    }
   } catch (error) {
     statusMessage.textContent =
       error instanceof Error ? error.message : 'Your request could not be sent. Please try again.';

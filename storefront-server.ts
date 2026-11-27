@@ -2,8 +2,8 @@ import express, { type ErrorRequestHandler } from 'express';
 import ts from 'typescript';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { checkoutRouter } from './checkout-server.ts';
-import { commissionRouter, initializeCommissionStorage } from './commission-server.ts';
+import { checkoutRouter, initializeCheckoutStorage } from './checkout/checkout-server.ts';
+import { commissionRouter, initializeCommissionStorage } from './commission/commission-server.ts';
 
 const projectRoot = process.cwd();
 const app = express();
@@ -12,14 +12,18 @@ app.disable('x-powered-by');
 app.use(commissionRouter);
 app.use(checkoutRouter);
 
-app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.html')));
-app.get('/commission.html', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.html')));
-app.get('/checkout.html', (_request, response) => response.sendFile(path.join(projectRoot, 'checkout.html')));
+app.get('/', (_request, response) => response.sendFile(path.join(projectRoot, 'commission', 'index.html')));
+app.get(['/commission', '/commission/', '/commission.html'], (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'commission', 'index.html')));
+app.get(['/checkout', '/checkout/', '/checkout.html'], (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'checkout', 'index.html')));
 app.get('/catalog.html', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
 app.get('/Pages/ShoppingCart.html', (_request, response) =>
   response.sendFile(path.join(projectRoot, 'Pages', 'ShoppingCart.html')));
-app.get('/commission.css', (_request, response) => response.sendFile(path.join(projectRoot, 'commission.css')));
-app.get('/checkout.css', (_request, response) => response.sendFile(path.join(projectRoot, 'checkout.css')));
+app.get('/commission/commission.css', (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'commission', 'commission.css')));
+app.get('/checkout/checkout.css', (_request, response) =>
+  response.sendFile(path.join(projectRoot, 'checkout', 'checkout.css')));
 app.get('/style.css', (_request, response) => response.sendFile(path.join(projectRoot, 'style.css')));
 app.use(
   '/src/assets',
@@ -41,8 +45,8 @@ function serveTypeScriptClient(sourceFile: string) {
   };
 }
 
-app.get('/commission-client.js', serveTypeScriptClient('commission-client.ts'));
-app.get('/checkout-client.js', serveTypeScriptClient('checkout-client.ts'));
+app.get('/commission/commission-client.js', serveTypeScriptClient('commission/commission-client.ts'));
+app.get('/checkout/checkout-client.js', serveTypeScriptClient('checkout/checkout-client.ts'));
 app.get('/storefront-cart.js', serveTypeScriptClient('storefront-cart.ts'));
 
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
@@ -53,6 +57,7 @@ app.use(errorHandler);
 
 async function startServer(): Promise<void> {
   await initializeCommissionStorage();
+  await initializeCheckoutStorage();
   const port = Number(process.env.PORT ?? 3000);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error('PORT must be an integer between 1 and 65535.');

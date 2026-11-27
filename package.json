@@ -21,6 +21,6 @@
   "scripts": {
     "start": "node --experimental-strip-types storefront-server.ts",
     "dev": "node --watch --experimental-strip-types storefront-server.ts",
-    "typecheck": "tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --strict --skipLibCheck checkout-client.ts checkout-server.ts commission-server.ts database.ts storefront-cart.ts storefront-server.ts"
+    "typecheck": "tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --allowImportingTsExtensions --strict --skipLibCheck checkout/checkout-client.ts checkout/checkout-server.ts commission/commission-server.ts database.ts storefront-cart.ts storefront-server.ts"
   }
 }

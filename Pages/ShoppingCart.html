@@ -45,23 +45,27 @@
             </label>
             <hr class="ShoppingCartTopDivider">
         </div>
-        <div id="cart-items" aria-live="polite"></div>
-        <p id="cart-page-status" role="status" aria-live="polite"></p>
+        <div class="cart-layout">
+            <div class="cart-content">
+                <div id="cart-items" aria-live="polite"></div>
+                <p id="cart-page-status" role="status" aria-live="polite"></p>
+            </div>
 
-        <form class="CheckOutForm" id="cart-checkout-form">
-            <div class="CheckoutSubtotal">
-                <p>
-                    Subtotal (<span id="cart-item-count">0</span>): <span id="cart-subtotal">$0.00</span>
-                </p>
-                <label>
-                    <input type="checkbox" class="Checkbox" id="confirm-cart-order" required>
-                    Confirm Order
-                </label>
-            </div>
-            <div class="ProceedToCheckoutButton">
-                <button type="submit" class="button" disabled>Proceed to Checkout</button>
-            </div>
-        </form>
+            <form class="CheckOutForm" id="cart-checkout-form">
+                <div class="CheckoutSubtotal">
+                    <p>
+                        Subtotal (<span id="cart-item-count">0</span>): <span id="cart-subtotal">$0.00</span>
+                    </p>
+                    <label>
+                        <input type="checkbox" class="Checkbox" id="confirm-cart-order" required>
+                        Confirm Order
+                    </label>
+                </div>
+                <div class="ProceedToCheckoutButton">
+                    <button type="submit" class="button" disabled>Proceed to Checkout</button>
+                </div>
+            </form>
+        </div>
     </main>
 
     <footer class="footer" id="about">

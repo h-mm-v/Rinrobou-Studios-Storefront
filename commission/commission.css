@@ -269,6 +269,13 @@
       border-color: var(--mint);
     }
 
+    .form-status {
+      min-height: 1.5em;
+      margin: 0;
+      color: var(--mint);
+      font-weight: 600;
+    }
+
     @media (max-width: 460px) {
       main {
         padding-inline: 16px;

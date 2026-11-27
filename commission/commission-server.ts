@@ -4,7 +4,7 @@ import multer from 'multer';
 import { mkdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { createDatabaseConnection } from './database.ts';
+import { createDatabaseConnection } from '../database.ts';
 
 interface CommissionRequest {
   email: string;
@@ -31,6 +31,28 @@ const uploadExtensions: Record<string, string[]> = {
 
 export async function initializeCommissionStorage(): Promise<void> {
   await mkdir(uploadDirectory, { recursive: true });
+
+  const connection = await createDatabaseConnection();
+  try {
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS commissions (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        email VARCHAR(254) NOT NULL,
+        phone VARCHAR(40) NULL,
+        description TEXT NOT NULL,
+        attachments TEXT NOT NULL,
+        physical BOOLEAN NOT NULL DEFAULT FALSE,
+        deadline DATE NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_commissions_created_at (created_at),
+        KEY idx_commissions_email (email)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+  } finally {
+    await connection.end();
+  }
 }
 
 export async function createCommission(commission: CommissionRequest): Promise<number> {
@@ -126,7 +148,7 @@ router.post('/api/commissions', upload.array('references', 5), async (request, r
     response.status(400).json({ message: 'Phone number must be 40 characters or fewer.' });
     return;
   }
-  if (deadline && !isValidDeadline(deadline)) {
+  if (!isValidDeadline(deadline)) {
     await removeUploadedFiles();
     response.status(400).json({ message: 'Enter a valid preferred deadline.' });
     return;

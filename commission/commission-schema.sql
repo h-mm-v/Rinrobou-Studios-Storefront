@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS commissions (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(254) NOT NULL,
+  phone VARCHAR(40) NULL,
+  description TEXT NOT NULL,
+  attachments TEXT NOT NULL,
+  physical BOOLEAN NOT NULL DEFAULT FALSE,
+  deadline DATE NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_commissions_created_at (created_at),
+  KEY idx_commissions_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
