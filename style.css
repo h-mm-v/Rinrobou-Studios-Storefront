@@ -170,7 +170,7 @@ button {
   align-items: center;
   justify-content: center;
 
-  
+
   padding: 0;
 
   border: none;
@@ -199,11 +199,13 @@ button {
 .nav-icons button {
   transition: color 0.2s ease;
 }
+
 .nav-links a:hover,
 .nav-icons a:hover,
 .nav-icons button:hover {
   color: #91e6d5;
 }
+
 .nav-icons a:hover svg,
 .nav-icons button:hover svg {
   color: var(--mint);
@@ -762,22 +764,8 @@ button {
 
   background: rgb(80 67 88 / 65%);
   color: white;
-  text-align: left;
-  font-family: Poppins, Arial, sans-serif;
-}
-
-/* Description text */
-
-.forgotPasswordContainer>p {
-  margin: 0 0 28px;
-  line-height: 1.35;
   text-align: center;
-  color: #FFF;
-  font-family: Poppins;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
+  font-family: Poppins, Arial, sans-serif;
 }
 
 /* Email label and input */
@@ -1138,14 +1126,14 @@ button {
   border: 0;
   border-radius: 8px;
   border: 2px solid rgb(199 115 239 / 65%);
-  background: rgb(199 115 239 / 65%);
+  background: #9A5AB9;
   color: #d9d9d9;
   font: 500 18px Poppins, sans-serif;
   cursor: pointer;
 }
 
 .ProceedToCheckoutButton .button:hover {
-  background: #9A5AB9;
+  background: rgb(199 115 239);
 }
 
 
@@ -1237,7 +1225,7 @@ button {
 }
 
 
-/* Categories Dropdown*/ 
+/* Categories Dropdown*/
 .categories-menu {
   position: relative;
 }
@@ -1293,7 +1281,7 @@ button {
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  
+
 }
 
 .whoWeAre {

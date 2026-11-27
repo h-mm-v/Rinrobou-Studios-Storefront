@@ -22,7 +22,7 @@
 
     .catalog-brand {
       width: 110px;
-      height: 52px;
+      height: 52px; 
       object-fit: contain;
     }
 
@@ -168,6 +168,135 @@
       font-weight: bold;
     }
 
+    /* New CSS for filters */
+    .filter-panel {
+      position: fixed;
+      z-index: 1001;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+
+      width: 310px;
+      max-width: 88vw;
+      padding: 26px 28px;
+
+      overflow-y: auto;
+      background: #0c0917;
+      color: white;
+      box-shadow: 8px 0 20px rgba(0, 0, 0, 0.4);
+
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .filter-panel.open {
+      transform: translateX(0);
+    }
+
+    .filter-overlay {
+      position: fixed;
+      z-index: 1000;
+      inset: 60px 0 0;
+
+      background: rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .filter-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .filter-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #777;
+    }
+
+    .filter-panel-header span {
+      margin-right: auto;
+      font-weight: bold;
+    }
+
+    .reset-filters,
+    .close-filters {
+      border: none;
+      background: transparent;
+      color: white;
+      cursor: pointer;
+    }
+
+    .reset-filters {
+      color: var(--mint);
+      text-decoration: underline;
+    }
+
+    .reset-filters:hover,
+    .close-filters:hover {
+      color: var(--pink);
+    }
+
+    .filter-group {
+      border-bottom: 1px solid #777;
+    }
+
+    .filter-group summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 17px 0;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .filter-group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .filter-group summary::after {
+      content: "▼";
+      font-size: 10px;
+    }
+
+    .filter-group label {
+      display: flex;
+      gap: 9px;
+      padding: 7px 0;
+      color: #d9d9d9;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .filter-group label:hover {
+      color: var(--mint);
+    }
+
+    .filter-group input {
+      accent-color: var(--mint);
+    }
+
+    .apply-filters {
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px;
+
+      border: none;
+      border-radius: 8px;
+      background: var(--mint);
+      color: #155b57;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .apply-filters:hover {
+      background: var(--pink);
+      color: white;
+    }
+    /* end */
     .pagination .active-page {
       background: #23d6c2;
       color: white;
@@ -211,6 +340,8 @@
         grid-template-columns: 1fr;
       }
     }
+
+    
   </style>
 </head>
 
@@ -517,6 +648,152 @@
   </footer>
 
   <!-- for All Filters button-->
+<div id="filter-overlay" class="filter-overlay"></div>
+
+<aside id="filter-panel" class="filter-panel" aria-hidden="true">
+  <div class="filter-panel-header">
+    <span>Filters</span>
+
+    <button id="reset-filters" class="reset-filters" type="button">
+      Reset
+    </button>
+
+    <button
+      id="close-filters"
+      class="close-filters"
+      type="button"
+      aria-label="Close filters"
+    >
+      ◀
+    </button>
+  </div>
+
+  <details class="filter-group" open>
+    <summary>Category</summary>
+
+    <label>
+      <input type="checkbox" name="category" value="animals" />
+      Animals
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="anime-style" />
+      Anime Style
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="character-design" />
+      Character Design
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="graphic-design" />
+      Graphic Design
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="mvs" />
+      MVs
+    </label>
+
+    <label>
+      <input type="checkbox" name="category" value="gifts" />
+      Gifts
+    </label>
+  </details>
+
+  <details class="filter-group">
+    <summary>Item Format</summary>
+
+    <label>
+      <input type="checkbox" name="format" value="prints" />
+      Prints
+    </label>
+
+    <label>
+      <input type="checkbox" name="format" value="acrylics" />
+      Acrylics
+    </label>
+
+    <label>
+      <input type="checkbox" name="format" value="digital" />
+      Digital Artwork
+    </label>
+  </details>
+
+  <details class="filter-group">
+    <summary>Popular</summary>
+
+    <label>
+      <input type="checkbox" name="popular" value="best-sellers" />
+      Best Sellers
+    </label>
+
+    <label>
+      <input type="checkbox" name="popular" value="limited-time" />
+      Limited Time
+    </label>
+
+    <label>
+      <input type="checkbox" name="popular" value="five-stars" />
+      Five-Star Rated
+    </label>
+  </details>
+
+  <details class="filter-group">
+    <summary>Price</summary>
+
+    <label>
+      <input type="radio" name="price" value="under-25" />
+      Under $25
+    </label>
+
+    <label>
+      <input type="radio" name="price" value="under-50" />
+      Under $50
+    </label>
+
+    <label>
+      <input type="radio" name="price" value="50-100" />
+      $50–$100
+    </label>
+
+    <label>
+      <input type="radio" name="price" value="over-100" />
+      Over $100
+    </label>
+  </details>
+
+  <details class="filter-group">
+    <summary>Color</summary>
+
+    <label>
+      <input type="checkbox" name="color" value="pink" />
+      Pink
+    </label>
+
+    <label>
+      <input type="checkbox" name="color" value="purple" />
+      Purple
+    </label>
+
+    <label>
+      <input type="checkbox" name="color" value="blue" />
+      Blue
+    </label>
+
+    <label>
+      <input type="checkbox" name="color" value="green" />
+      Green
+    </label>
+  </details>
+
+  <button id="apply-filters" class="apply-filters" type="button">
+    APPLY FILTERS
+  </button>
+</aside>
+
+  <!--end-->
   <div id="filter-overlay" class="filter-overlay"></div>
 
     <aside
@@ -576,36 +853,47 @@
     </aside>
 
     <script>
-        const filterButton = document.getElementById("all-filters-button");
-        const filterPanel = document.getElementById("filter-panel");
-        const filterOverlay = document.getElementById("filter-overlay");
-        const closeFilters = document.getElementById("close-filters");
+      const filterButton = document.getElementById("all-filters-button");
+      const filterPanel = document.getElementById("filter-panel");
+      const filterOverlay = document.getElementById("filter-overlay");
+      const closeFilters = document.getElementById("close-filters");
+      const resetFilters = document.getElementById("reset-filters");
+      const applyFilters = document.getElementById("apply-filters");
 
-        function openFilters() {
-            filterPanel.classList.add("open");
-            filterOverlay.classList.add("visible");
+      function openFilters() {
+        filterPanel.classList.add("open");
+        filterOverlay.classList.add("visible");
 
-            filterButton.setAttribute("aria-expanded", "true");
-            filterPanel.setAttribute("aria-hidden", "false");
+        filterButton.setAttribute("aria-expanded", "true");
+        filterPanel.setAttribute("aria-hidden", "false");
+      }
+
+      function closeFilterPanel() {
+        filterPanel.classList.remove("open");
+        filterOverlay.classList.remove("visible");
+
+        filterButton.setAttribute("aria-expanded", "false");
+        filterPanel.setAttribute("aria-hidden", "true");
+      }
+
+      filterButton.addEventListener("click", openFilters);
+      closeFilters.addEventListener("click", closeFilterPanel);
+      filterOverlay.addEventListener("click", closeFilterPanel);
+      applyFilters.addEventListener("click", closeFilterPanel);
+
+      resetFilters.addEventListener("click", function () {
+        document
+          .querySelectorAll("#filter-panel input")
+          .forEach(function (input) {
+            input.checked = false;
+          });
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeFilterPanel();
         }
-
-        function closeFilterPanel() {
-            filterPanel.classList.remove("open");
-            filterOverlay.classList.remove("visible");
-
-            filterButton.setAttribute("aria-expanded", "false");
-            filterPanel.setAttribute("aria-hidden", "true");
-        }
-
-        filterButton.addEventListener("click", openFilters);
-        closeFilters.addEventListener("click", closeFilterPanel);
-        filterOverlay.addEventListener("click", closeFilterPanel);
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-            closeFilterPanel();
-            }
-        });
+      });
     </script>
 
     <!--Categories dropdown code-->
