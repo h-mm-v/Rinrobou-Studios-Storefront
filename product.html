@@ -130,8 +130,8 @@
             </svg>
           </button>
         </div>
-        <span class="product-category">PRODUCT CATEGORY</span>
-        <h1>Product Name</h1>
+        <span class="product-category" id="product-category">PRODUCT CATEGORY</span>
+        <h1 id="product-name">Product Name</h1>
 
         <p class="price-label">Price</p>
         <h2 class="product-price" id="product-price">$XX.XX</h2>
@@ -214,7 +214,7 @@
             </span>
           </label>
 
-          <a href="/commission/" class="order-now-button" id="order-now" aria-disabled="true" tabindex="-1">
+          <a href="/commission/commission" class="order-now-button" id="order-now" aria-disabled="true" tabindex="-1">
             ORDER NOW
           </a>
         </div>
@@ -264,27 +264,7 @@
         <section id="details-panel" class="product-panel" hidden>
           <div class="product-details-layout">
             <div class="product-details-text">
-              <ul class="details-list">
-                <li>Fully rendered, full body PNG</li>
-                <li>
-                  At this time, this type of commission accepts
-                  a max of <strong>3-4 characters.</strong>
-                  Please let us know if you would like all
-                  characters together on the same canvas or separate.
-                </li>
-                <li>
-                  Pricing is buy one half chibi, get one half
-                  chibi 50% off. Simple colored background and
-                  transparent background included.
-                </li>
-                <li>
-                  Any complex details will be simplified to
-                  fit the half chibi art style.
-                </li>
-                <li>
-                  Small props and simplified animals/mascots
-                  are okay to ask for with no added cost.
-                </li>
+              <ul class="details-list" id="product-details-list">
               </ul>
             </div>
 
@@ -299,47 +279,7 @@
           <div class="product-reviews">
 
             <div class="reviews-summary">
-              <div class="rating-breakdown">
-
-                <div class="rating-row">
-                  <span>★★★★★</span>
-                  <div class="rating-bar">
-                    <div style="width:100%"></div>
-                  </div>
-                  <span>100%</span>
-                </div>
-
-                <div class="rating-row">
-                  <span>★★★★☆</span>
-                  <div class="rating-bar">
-                    <div style="width:0%"></div>
-                  </div>
-                  <span>0%</span>
-                </div>
-
-                <div class="rating-row">
-                  <span>★★★☆☆</span>
-                  <div class="rating-bar">
-                    <div style="width:0%"></div>
-                  </div>
-                  <span>0%</span>
-                </div>
-
-                <div class="rating-row">
-                  <span>★★☆☆☆</span>
-                  <div class="rating-bar">
-                    <div style="width:0%"></div>
-                  </div>
-                  <span>0%</span>
-                </div>
-
-                <div class="rating-row">
-                  <span>★☆☆☆☆</span>
-                  <div class="rating-bar">
-                    <div style="width:0%"></div>
-                  </div>
-                  <span>0%</span>
-                </div>
+              <div class="rating-breakdown" id="rating-breakdown">
               </div>
 
               <div class="overall-rating">
@@ -347,51 +287,19 @@
                   <img src="./src/assets/product-reviews.png" alt="RinRobou Studios commission artwork"
                     class="reviews-page-art">
                 </div>
-                <p>⭐ 5.0 – 2 reviews</p>
+                <p id="overall-rating-text">No reviews yet</p>
               </div>
             </div>
 
-            <div class="review-cards">
-
-              <article class="review-card">
-                <div class="review-header">
-                  <div class="review-user">
-                    <div class="user-avatar">U1</div>
-                    <div>
-                      <strong>Username 1</strong>
-                      <p>★★★★★ · Jan 2026</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="review-body">
-                  <p>Customer review placeholder...</p>
-                  <div class="review-image-placeholder">
-                    Review Image
-                  </div>
-                </div>
-              </article>
-
-              <article class="review-card">
-                <div class="review-header">
-                  <div class="review-user">
-                    <div class="user-avatar">U2</div>
-                    <div>
-                      <strong>Username 2</strong>
-                      <p>★★★★★ · Aug 2026</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="review-body">
-                  <p>Customer review placeholder...</p>
-                  <div class="review-image-placeholder">
-                    Review Image
-                  </div>
-                </div>
-              </article>
-
+            <div class="review-cards" id="review-cards">
             </div>
+
+            <div class="reviews-button-container">
+              <button type="button" id="toggle-reviews" class="toggle-reviews" hidden>
+                View All Reviews
+              </button>
+            </div>
+
           </div>
         </section>
 
@@ -428,7 +336,7 @@
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
-  <script type="module" src="./product.js"></script>
+  <script type="module" src="./product.ts"></script>
 </body>
 
 </html>
