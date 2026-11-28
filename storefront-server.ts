@@ -23,7 +23,7 @@ for (const publicFile of [
 ]) {
   app.get(`/${publicFile}`, (_request, response) => response.sendFile(path.join(projectRoot, publicFile)));
 }
-app.get('/AboutUsPage.html', (_request, response) =>
+app.get(['/AboutUsPage.html', '/src/pages/AboutUsPage.html'], (_request, response) =>
   response.sendFile(path.join(projectRoot, 'src', 'pages', 'AboutUsPage.html')));
 app.get('/catalog.html', (_request, response) => response.sendFile(path.join(projectRoot, 'catalog.html')));
 app.get('/Pages/ShoppingCart.html', (_request, response) =>
