@@ -582,10 +582,6 @@ button {
 
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
-}
-
 /*Sign Up Page CSS*/
 
 .signUpBackground {
@@ -600,14 +596,12 @@ button {
 
 .signUpContainer {
   margin-left: 10%;
-  width: 20%;
-  height: 80%;
+  width: clamp(450px, 28vw, 500px);
   padding: 1.25rem;
+  border: 1px solid #000;
   border-radius: 12px;
   background: rgb(217 217 217 / 65%);
-  border-color: #000;
-  color: #111;
-  font-size: 1rem;
+  border-color: #000;  color: #111;
 }
 
 .signUpContainer h1 {
@@ -622,6 +616,7 @@ button {
   text-align: left;
   margin: 0.5rem 0 0.2rem;
 }
+
 
 .signUpContainer>input {
   display: block;
@@ -668,32 +663,34 @@ button {
 }
 
 .form-field input {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 52px;
+  padding: 0.5rem 0.75rem;
   text-align: center;
   color: #000;
   font-family: "Nanum Pen";
-  font-size: 40px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  width: 450px;
-  height: 100px;
-  border-radius: 30px;
+  font-size: clamp(1.25rem, 2vw, 2.25rem);
+  border-radius: 20px;
   border: 2px solid #000;
-  background: rgb(217 217 217 / 65%);
+  background: rgb( 217 217 217/ 65%)
 }
 
-.terms {
+.signUpContainer label.terms {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  font-size: 20px;
+  white-space: nowrap;
   gap: 0.35rem;
   margin: 0.7rem 0;
-  white-space: nowrap;
   cursor: pointer;
+
 }
 
 .terms a {
   text-decoration: underline;
+
 }
 
 .login {
