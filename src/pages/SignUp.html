@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/png" href="../assets/logo-small.png">
+    <title>Sign Up</title>
+</head>
+
+
+<body>
+    <!-- Header Section -->
+    <header class="navbar">
+        <nav class="nav-links">
+        <a href="homepage.html">Home</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="about-us.html">About Us</a>
+        </nav>
+
+        <a href="homepage.html" class="nav-logo">
+        <img src="../assets/logo-small.png" alt="RinRobou Studios" />
+        </a>
+
+        <div class="nav-icons d-flex align-items-center">
+        <a href="login.html">
+            <button class="icon-button" aria-label="Account">
+                    <svg
+                        width="16"
+                        height="16"
+                        stroke-width="1"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <circle cx="12" cy="8" r="3.5"></circle>
+                        <path d="M5 20c.8-3.5 3.2-5.5 7-5.5s6.2 2 7 5.5"></path>
+                    </svg>
+            </button>
+            </a>
+        <a href="SearchResultsPage.html">
+            <button aria-label="Search">
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                viewBox="0 0 24 24"
+                >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </a>
+        <a href="checkout.html">
+            <button aria-label="Shopping cart">
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"
+            >
+                <circle cx="8" cy="21" r="1"></circle>
+                <circle cx="19" cy="21" r="1"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+            </svg>
+            </button>
+        </a>
+        
+        </div>
+    </header>
+
+    <main class="signUpBackground">
+        <form class="signUpContainer" action="../homepage.html" method="get">
+            <h1>Sign Up</h1>
+
+            <label for "email">Email Address</label>
+            <div class="form-field">
+                <input id="email" name="email" type="email" placeholder="example@email.com" required>
+            </div>
+
+
+            <label for "password">Password</label>
+            <div class="form-field">
+                <input id="password" name="password" type="password" placeholder="Password123!!" required>
+            </div>
+
+            <label for "confirm-password">Re-Enter Password</label>
+            <div class="form-field">
+                <input id="confirm-password" name="confirm-password" type="password" placeholder="Password123!!"
+                    required>
+            </div>
+
+            <label class="terms" for="terms">
+                <input type="checkbox" class="Checkbox" required>
+                I agree to <a href="/terms-of-service.html">terms and services</a>
+            </label>
+
+            <button type="submit" class="button">Confirm</button>
+
+            <!--Need to connect to Sign In Page-->
+
+            <p class="login">Already have an account? <a href="../login.html">Log in</a></p>
+
+        </form>
+    </main>
+
+    <footer class="footer" id="about">
+        <div>
+            <img src="../assets/logo-large.png" alt="RinRobou Studios" class="footer-logo" />
+
+            <div class="footer-columns">
+                <div>
+                    <strong>(951)-208-5524</strong>
+                    <p>rinroboustudios@gmail.com</p>
+                    <p>Burbank, CA</p>
+                </div>
+
+                <div>
+                    <strong>Business Hours</strong>
+                    <p>MONDAY - FRIDAY</p>
+                    <p>9:00 AM - 5:00 PM</p>
+                </div>
+            </div>
+        </div>
+        <img src="../assets/footer-art.png" alt="Character artwork" class="footer-art" />
+        <small>©2027 RinRobou Studios, All Rights Reserved</small>
+    </footer>
+</body>
+
+</html>
