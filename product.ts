@@ -1,3 +1,23 @@
+interface ProductReview {
+    id: number;
+    name: string;
+    rating: number;
+    text: string | null;
+    date: string;
+    image: string | null;
+}
+
+interface Product {
+    id: number;
+    name: string;
+    category: string | null;
+    price: number;
+    waitlistActive: boolean;
+    images: string[];
+    details: string[];
+    reviews: ProductReview[];
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     /* Back Button */
     const backButton = document.querySelector<HTMLButtonElement>(
@@ -83,11 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     changeTab("description");
 
     /* Product Carousel */
-    let productImages: string[] = [
-        "/src/assets/halfchibi 1.png",
-        "/src/assets/halfchibi 2.png",
-        "/src/assets/halfchibi 3.png"
-    ];
+    let productImages: string[] = [];
 
     let currentImageIndex = 0;
 
@@ -184,10 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateImage(currentImageIndex + 1);
     });
 
-    updateGallery(productImages);
-
     /* Image Protection */
-
     document.addEventListener("contextmenu", (event) => {
         const target = event.target;
 
@@ -486,6 +499,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateOrderButton();
 
+    /* Product Details */
+    function updateProductDetails(details: string[]): void {
+        const detailsList = document.querySelector<HTMLUListElement>(
+            "#product-details-list"
+        );
+
+        if (!detailsList) return;
+
+        detailsList.replaceChildren();
+
+        details.forEach((detail) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = detail;
+            detailsList.appendChild(listItem);
+        });
+    }
+
+    async function loadProduct(): Promise<void> {
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get("id");
+
+        if (!productId) return;
+
+        try {
+            const response = await fetch(
+                `/api/products/${encodeURIComponent(productId)}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Unable to load product");
+            }
+
+            const product: Product = await response.json();
+            updateGallery(product.images);
+
+            document.querySelector<HTMLElement>("#product-name")!
+                .textContent = product.name;
+
+            document.querySelector<HTMLElement>("#product-category")!
+                .textContent = product.category ?? "";
+
+            document.querySelector<HTMLElement>("#product-price")!
+                .textContent = `$${product.price.toFixed(2)}`;
+
+            updateProductDetails(product.details);
+
+            console.log("Loaded reviews:", product.reviews);
+
+        } catch (error) {
+            console.error("Product loading failed:", error);
+        }
+    }
+
+    void loadProduct();
 });
 
 document.addEventListener("dragstart", (event) => {

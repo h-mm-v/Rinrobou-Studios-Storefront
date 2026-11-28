@@ -130,8 +130,8 @@
             </svg>
           </button>
         </div>
-        <span class="product-category">PRODUCT CATEGORY</span>
-        <h1>Product Name</h1>
+        <span class="product-category" id="product-category">PRODUCT CATEGORY</span>
+        <h1 id="product-name">Product Name</h1>
 
         <p class="price-label">Price</p>
         <h2 class="product-price" id="product-price">$XX.XX</h2>
@@ -214,7 +214,7 @@
             </span>
           </label>
 
-          <a href="/commission/" class="order-now-button" id="order-now" aria-disabled="true" tabindex="-1">
+          <a href="/commission/commission" class="order-now-button" id="order-now" aria-disabled="true" tabindex="-1">
             ORDER NOW
           </a>
         </div>
@@ -264,7 +264,7 @@
         <section id="details-panel" class="product-panel" hidden>
           <div class="product-details-layout">
             <div class="product-details-text">
-              <ul class="details-list">
+              <ul class="details-list" id="product-details-list">
                 <li>Fully rendered, full body PNG</li>
                 <li>
                   At this time, this type of commission accepts
@@ -428,7 +428,7 @@
 
     <small>©2027 RinRobou Studios, All Rights Reserved</small>
   </footer>
-  <script type="module" src="./product.js"></script>
+  <script type="module" src="./product.ts"></script>
 </body>
 
 </html>
