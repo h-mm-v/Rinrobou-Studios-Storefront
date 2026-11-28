@@ -456,10 +456,6 @@ button {
 
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
-}
-
 /*Sign Up Page CSS*/
 
 .signUpBackground {
@@ -470,7 +466,6 @@ button {
   background-repeat: no-repeat;
   display: flex;
   align-items: center;
-  box-sizing: border-box;
 }
 
 .signUpContainer {
