@@ -499,6 +499,161 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateOrderButton();
 
+
+    /* Product Reviews */
+    function updateProductReviews(reviews: ProductReview[]): void {
+        const breakdown = document.querySelector<HTMLElement>(
+            "#rating-breakdown"
+        );
+
+        const overallRating = document.querySelector<HTMLElement>(
+            "#overall-rating-text"
+        );
+
+        const reviewCards = document.querySelector<HTMLElement>(
+            "#review-cards"
+        );
+
+        if (!breakdown || !overallRating || !reviewCards) return;
+
+        breakdown.replaceChildren();
+        reviewCards.replaceChildren();
+
+        const totalReviews = reviews.length;
+
+        const averageRating = totalReviews > 0
+            ? reviews.reduce((sum, review) => sum + review.rating, 0)
+            / totalReviews
+            : 0;
+
+        overallRating.textContent = totalReviews > 0
+            ? `⭐ ${averageRating.toFixed(1)} – ${totalReviews} ${totalReviews === 1 ? "review" : "reviews"
+            }`
+            : "No reviews yet";
+
+        for (let stars = 5; stars >= 1; stars--) {
+            const count = reviews.filter(
+                review => Math.round(review.rating) === stars
+            ).length;
+
+            const percentage = totalReviews > 0
+                ? (count / totalReviews) * 100
+                : 0;
+
+            const row = document.createElement("div");
+            row.className = "rating-row";
+
+            const starLabel = document.createElement("span");
+            starLabel.textContent =
+                "★".repeat(stars) + "☆".repeat(5 - stars);
+
+            const bar = document.createElement("div");
+            bar.className = "rating-bar";
+
+            const fill = document.createElement("div");
+            fill.style.width = `${percentage}%`;
+
+            bar.appendChild(fill);
+
+            const percentageLabel = document.createElement("span");
+            percentageLabel.textContent =
+                `${Math.round(percentage)}%`;
+
+            row.append(starLabel, bar, percentageLabel);
+            breakdown.appendChild(row);
+        }
+
+        reviews.forEach((review) => {
+            const card = document.createElement("article");
+            card.className = "review-card";
+
+            const header = document.createElement("div");
+            header.className = "review-header";
+
+            const user = document.createElement("div");
+            user.className = "review-user";
+
+            const avatar = document.createElement("div");
+            avatar.className = "user-avatar";
+            avatar.textContent =
+                (review.name || "Anonymous").slice(0, 2).toUpperCase();
+
+            const userInfo = document.createElement("div");
+
+            const username = document.createElement("strong");
+            username.textContent = review.name || "Anonymous";
+
+            const ratingDate = document.createElement("p");
+
+            const date = new Date(review.date);
+            const formattedDate = Number.isNaN(date.getTime())
+                ? ""
+                : date.toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric"
+                });
+
+            const rating = Math.max(0, Math.min(5, Number(review.rating)));
+            
+            ratingDate.className = "review-rating";
+
+            const stars = document.createElement("span");
+            stars.className = "review-stars";
+            stars.setAttribute("aria-label", `${rating.toFixed(1)} out of 5 stars`);
+
+            const emptyStars = document.createElement("span");
+            emptyStars.className = "empty-stars";
+            emptyStars.textContent = "★★★★★";
+
+            const filledStars = document.createElement("span");
+            filledStars.className = "filled-stars";
+            filledStars.textContent = "★★★★★";
+            filledStars.style.width = `${(rating / 5) * 100}%`;
+
+            stars.append(emptyStars, filledStars);
+
+            const ratingValue = document.createElement("span");
+            ratingValue.className = "review-rating-value";
+            ratingValue.textContent = rating.toFixed(1);
+
+            const reviewDate = document.createElement("span");
+            reviewDate.className = "review-date";
+            reviewDate.textContent = `· ${formattedDate}`;
+
+            ratingDate.append(stars, ratingValue, reviewDate);
+
+
+            userInfo.append(username, ratingDate);
+            user.append(avatar, userInfo);
+            header.appendChild(user);
+
+            const body = document.createElement("div");
+            body.className = "review-body";
+
+            if (review.text) {
+                const text = document.createElement("p");
+                text.textContent = review.text;
+                body.appendChild(text);
+            }
+
+            if (review.image) {
+                const imageContainer = document.createElement("div");
+                imageContainer.className = "review-image-placeholder";
+
+                const image = document.createElement("img");
+                image.src = review.image;
+                image.alt = `Review image from ${review.name || "Anonymous"}`;
+                image.loading = "lazy";
+
+                imageContainer.appendChild(image);
+                body.appendChild(imageContainer);
+            }
+
+            card.append(header, body);
+            reviewCards.appendChild(card);
+        });
+    }
+
     /* Product Details */
     function updateProductDetails(details: string[]): void {
         const detailsList = document.querySelector<HTMLUListElement>(
@@ -545,7 +700,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             updateProductDetails(product.details);
 
-            console.log("Loaded reviews:", product.reviews);
+            updateProductReviews(product.reviews);
 
         } catch (error) {
             console.error("Product loading failed:", error);
