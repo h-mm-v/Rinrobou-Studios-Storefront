@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
             const rating = Math.max(0, Math.min(5, Number(review.rating)));
-            
+
             ratingDate.className = "review-rating";
 
             const stars = document.createElement("span");
@@ -652,6 +652,39 @@ document.addEventListener("DOMContentLoaded", () => {
             card.append(header, body);
             reviewCards.appendChild(card);
         });
+
+        const toggleButton = document.querySelector<HTMLButtonElement>(
+            "#toggle-reviews"
+        );
+
+        let showAllReviews = false;
+
+        function updateReviewVisibility(): void {
+            if (!reviewCards) return;
+            
+            const cards = reviewCards.querySelectorAll<HTMLElement>(
+                ".review-card"
+            );
+
+            cards.forEach((card, index) => {
+                card.hidden = !showAllReviews && index >= 2;
+            });
+
+            if (toggleButton) {
+                toggleButton.hidden = cards.length <= 2;
+
+                toggleButton.textContent = showAllReviews
+                    ? "Show Less"
+                    : `View All Reviews (${cards.length})`;
+            }
+        }
+
+        toggleButton?.addEventListener("click", () => {
+            showAllReviews = !showAllReviews;
+            updateReviewVisibility();
+        });
+
+        updateReviewVisibility();
     }
 
     /* Product Details */
